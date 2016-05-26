@@ -151,16 +151,21 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
     @Override
     public void reconnect(){
-        try {
-            mXmppConnection.connect();
-            mXmppConnection.login(mUsername,mPassword);
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	mExecService.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+		            mXmppConnection.connect();
+		            mXmppConnection.login(mUsername,mPassword);
+		        } catch (XMPPException e) {
+		            e.printStackTrace();
+		        } catch (SmackException e) {
+		            e.printStackTrace();
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
+			}
+		});
     }
 
 

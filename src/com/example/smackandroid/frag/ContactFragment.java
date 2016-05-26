@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jivesoftware.smack.PresenceListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
@@ -24,7 +25,7 @@ import com.example.smackandroid.AfterLoginActivity;
 import com.example.smackandroid.R;
 import com.example.smackandroid.service.XMPPService.XMPPBinder;
 
-public class ContactFragment extends BaseFragment implements RosterListener{
+public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener{
 	
 	private ListView mContactList;
 	private Roster mRoster;
@@ -157,6 +158,12 @@ public class ContactFragment extends BaseFragment implements RosterListener{
 				state = (TextView) convertView.findViewById(R.id.tv_presence);
 			}
 		}
+		
+	}
+
+	@Override
+	public void processPresence(Presence presence) {
+		// TODO Auto-generated method stub
 		
 	}
 

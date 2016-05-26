@@ -150,7 +150,15 @@ public class AfterLoginActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		if(mXmppService != null && !mXmppService.getConnection().isConnected()) {
+			mXmppService.reconnect();
+		}
+		super.onResume();
+	}
 	
 	@Override
 	protected void onDestroy() {
