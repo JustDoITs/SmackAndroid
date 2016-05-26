@@ -2,6 +2,10 @@ package com.example.smackandroid;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 
+import com.example.smackandroid.service.XMPPService;
+import com.example.smackandroid.service.XMPPService.XMPPBinder;
+import com.example.smackandroid.xmpp.XMPPLoginCallback;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -20,10 +24,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.smackandroid.service.XMPPService;
-import com.example.smackandroid.service.XMPPService.XMPPBinder;
-import com.example.smackandroid.xmpp.XMPPLoginCallback;
-
 public class LoginActivity extends ActionBarActivity {
 
 	private static final int MSG_LOGIN_FAILED = 0x002;
@@ -40,13 +40,13 @@ public class LoginActivity extends ActionBarActivity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_LOGIN_SUCCESS:
-				Toast.makeText(LoginActivity.this, "��¼�ɹ�", Toast.LENGTH_SHORT).show();
+				Toast.makeText(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(LoginActivity.this,AfterLoginActivity.class);
 				startActivity(intent);
 				finish();
 				break;
 			case MSG_LOGIN_FAILED:
-				Toast.makeText(LoginActivity.this, "��¼ʧ��", Toast.LENGTH_SHORT).show();
+				Toast.makeText(LoginActivity.this, "登陆失败，继续潜水", Toast.LENGTH_SHORT).show();
 				break;
 			default:
 				break;
