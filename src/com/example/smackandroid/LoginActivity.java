@@ -6,10 +6,7 @@ import com.example.smackandroid.service.XMPPService;
 import com.example.smackandroid.service.XMPPService.XMPPBinder;
 import com.example.smackandroid.xmpp.XMPPLoginCallback;
 
-<<<<<<< HEAD
 import android.app.Activity;
-=======
->>>>>>> b32808758fffae8b0ca8e82df215735fb61f64ab
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -27,11 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-<<<<<<< HEAD
 public class LoginActivity extends Activity {
-=======
-public class LoginActivity extends ActionBarActivity {
->>>>>>> b32808758fffae8b0ca8e82df215735fb61f64ab
 
 	private static final int MSG_LOGIN_FAILED = 0x002;
 	private static final int MSG_LOGIN_SUCCESS = 0x001;
