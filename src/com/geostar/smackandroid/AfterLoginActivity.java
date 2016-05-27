@@ -1,4 +1,4 @@
-package com.example.smackandroid;
+package com.geostar.smackandroid;
 
 import java.util.Locale;
 
@@ -17,12 +17,13 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.smackandroid.frag.BaseFragment;
-import com.example.smackandroid.frag.ContactFragment;
-import com.example.smackandroid.frag.MessageFragment;
-import com.example.smackandroid.frag.SettingsFragment;
-import com.example.smackandroid.service.XMPPService;
-import com.example.smackandroid.service.XMPPService.XMPPBinder;
+import com.example.smackandroid.R;
+import com.geostar.smackandroid.frag.BaseFragment;
+import com.geostar.smackandroid.frag.ContactFragment;
+import com.geostar.smackandroid.frag.MessageFragment;
+import com.geostar.smackandroid.frag.SettingsFragment;
+import com.geostar.smackandroid.service.XMPPService;
+import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
 public class AfterLoginActivity extends Activity {
 

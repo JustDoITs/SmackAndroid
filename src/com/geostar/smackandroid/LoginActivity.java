@@ -1,10 +1,11 @@
-package com.example.smackandroid;
+package com.geostar.smackandroid;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 
-import com.example.smackandroid.service.XMPPService;
-import com.example.smackandroid.service.XMPPService.XMPPBinder;
-import com.example.smackandroid.xmpp.XMPPLoginCallback;
+import com.example.smackandroid.R;
+import com.geostar.smackandroid.service.XMPPService;
+import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
 import android.app.Activity;
 import android.app.Service;

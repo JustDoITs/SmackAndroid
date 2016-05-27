@@ -1,4 +1,4 @@
-package com.example.smackandroid.xmpp;
+package com.geostar.smackandroid.xmpp;
 
 
 import org.jivesoftware.smack.AbstractXMPPConnection;

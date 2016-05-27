@@ -1,10 +1,10 @@
-package com.example.smackandroid.frag;
+package com.geostar.smackandroid.frag;
 
 import android.app.Fragment;
 import android.content.ServiceConnection;
 
-import com.example.smackandroid.AfterLoginActivity;
-import com.example.smackandroid.service.XMPPService;
+import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.service.XMPPService;
 
 public abstract class BaseFragment extends Fragment implements ServiceConnection {
 

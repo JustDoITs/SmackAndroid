@@ -1,4 +1,4 @@
-package com.example.smackandroid.frag;
+package com.geostar.smackandroid.frag;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,9 +21,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.smackandroid.AfterLoginActivity;
 import com.example.smackandroid.R;
-import com.example.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
 public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener{
 	
@@ -78,7 +78,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	
 	
 	/* 
-	 * »¨Ãû²á¸Ä±ä 
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ 
 	 */
 	
 	@Override
@@ -142,7 +142,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 			
 			RosterEntry entry = getItem(position);
 			holder.user.setText(entry.getUser());
-			//»ñÈ¡ÓÃ»§×´Ì¬
+			//ï¿½ï¿½È¡ï¿½Ã»ï¿½×´Ì¬
 			Presence pre = ContactFragment.this.mRoster.getPresence(entry.getUser());
 			String nickname = TextUtils.isEmpty(entry.getName())?"":("("+ entry.getName()+")" );
 			holder.state.setText(nickname + (pre.getStatus()==null?"":pre.getStatus()));

@@ -1,4 +1,4 @@
-package com.example.smackandroid.service;
+package com.geostar.smackandroid.service;
 
 
 import java.io.IOException;
@@ -32,8 +32,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.smackandroid.R;
-import com.example.smackandroid.xmpp.IXMPPFunc;
-import com.example.smackandroid.xmpp.XMPPLoginCallback;
+import com.geostar.smackandroid.xmpp.IXMPPFunc;
+import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
 public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback {
 
@@ -52,7 +52,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 //        username = intent.getStringExtra("username");
 //        password = intent.getStringExtra("password");
 //        if(!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
-//            // ³¢ÊÔµÇÂ¼
+//            // ï¿½ï¿½ï¿½Ôµï¿½Â¼
 //            login(username,password,this);
 //        }
         return super.onStartCommand(intent, flags, startId);
@@ -103,17 +103,17 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
         mXmppConnection = new XMPPTCPConnection(config);
         mXmppConnection.connect();
 
-        // ·þÎñÆ÷À´µÄÏûÏ¢¼àÌý
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
         registerPacketListener();
     }
 
     private void registerPacketListener() {
-    	// StanzaListener ÎªÒì²½µÄ£»ÁíÓÐPacketCollector ÎªÍ¬²½µÄ 
+    	// StanzaListener Îªï¿½ì²½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½PacketCollector ÎªÍ¬ï¿½ï¿½ï¿½ï¿½ 
         StanzaListener presenceTypelistener = new StanzaListener() {
             @Override
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
                 sendMsgNotification();
-                Log.d(TAG,"½ÓÊÕµ½Ò»ÌõÏûÏ¢ PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
+                Log.d(TAG,"ï¿½ï¿½ï¿½Õµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
             }
         };
         StanzaListener Messagelistener = new StanzaListener() {
@@ -122,12 +122,12 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
                 sendMsgNotification();
                 if(packet instanceof org.jivesoftware.smack.packet.Message){
                     org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
-                    Log.d(TAG,"½ÓÊÕµ½Ò»ÌõÏûÏ¢ - MessageWithBodiesFilter : " +  msg.getBody());
+                    Log.d(TAG,"ï¿½ï¿½ï¿½Õµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ - MessageWithBodiesFilter : " +  msg.getBody());
                 }
             }
         };
 //        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
-       //  MessageWithBodiesFilter.INSTANCE£¬ForEveryMessage.INSTANCE Îª²»Í¬µÄÏûÏ¢¹ýÂËÆ÷
+       //  MessageWithBodiesFilter.INSTANCEï¿½ï¿½ForEveryMessage.INSTANCE Îªï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         mXmppConnection.addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
         mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.AVAILABLE);
         
@@ -170,10 +170,10 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
 
     /**
-     * µÇÂ¼
+     * ï¿½ï¿½Â¼
      * @param usrName
      * @param pwd
-     * @param callback µÇÂ¼½á¹û»Øµ÷£¬²»ÒªÔÚ»Øµ÷·½·¨ÖÐ²Ù×÷UI
+     * @param callback ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ú»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½UI
      */
     public void login(final String usrName,final String pwd,final XMPPLoginCallback callback) {
         Runnable work = new Runnable() {
@@ -233,7 +233,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
 
     /**
-     * ·¢ËÍÏûÏ¢
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
      * @param toUser
      * @param msg
      */

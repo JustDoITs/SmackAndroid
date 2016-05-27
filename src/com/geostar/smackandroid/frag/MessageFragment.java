@@ -1,4 +1,4 @@
-package com.example.smackandroid.frag;
+package com.geostar.smackandroid.frag;
 
 import android.content.ComponentName;
 import android.os.Bundle;
@@ -7,19 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.smackandroid.AfterLoginActivity;
 import com.example.smackandroid.R;
+import com.geostar.smackandroid.AfterLoginActivity;
 
-public class SettingsFragment extends BaseFragment {
+public class MessageFragment extends BaseFragment {
 
-	public SettingsFragment(AfterLoginActivity activity) {
+	public MessageFragment(AfterLoginActivity activity) {
 		super(activity);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.settings, null);
+		return inflater.inflate(R.layout.messages, null);
 	}
 
 	@Override
@@ -33,7 +33,6 @@ public class SettingsFragment extends BaseFragment {
 		// TODO Auto-generated method stub
 		
 	}
-	
 	
 
 }
