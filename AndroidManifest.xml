@@ -29,6 +29,7 @@
         </activity>
 
        <service android:name=".service.XMPPService"></service>
+       <service android:name=".service.NewXMPPService"></service>
 
         <activity
             android:name="com.geostar.smackandroid.AfterLoginActivity"

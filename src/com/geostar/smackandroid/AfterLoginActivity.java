@@ -21,8 +21,7 @@ import com.geostar.smackandroid.frag.BaseFragment;
 import com.geostar.smackandroid.frag.ContactFragment;
 import com.geostar.smackandroid.frag.MessageFragment;
 import com.geostar.smackandroid.frag.SettingsFragment;
-import com.geostar.smackandroid.service.XMPPService;
-import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.service.NewXMPPService;
 
 public class AfterLoginActivity extends FragmentActivity {
 
@@ -30,9 +29,9 @@ public class AfterLoginActivity extends FragmentActivity {
 
 	ViewPager mViewPager;
 	
-	private XMPPService mXmppService;
+	private NewXMPPService mXmppService;
 	
-	private  XMPPService getXmppService(){
+	private  NewXMPPService getXmppService(){
 		return mXmppService;
 	}
 	
@@ -47,7 +46,7 @@ public class AfterLoginActivity extends FragmentActivity {
 		
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			mXmppService = ((XMPPBinder)service).getService();
+			mXmppService = ((NewXMPPService.XMPPBinder)service).getService();
 			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
 				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(name, service);
 			}
@@ -70,7 +69,7 @@ public class AfterLoginActivity extends FragmentActivity {
 					}
 				});
 		
-		Intent intent = new Intent(this,XMPPService.class);
+		Intent intent = new Intent(this,NewXMPPService.class);
 		bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
 	}
 
@@ -154,9 +153,9 @@ public class AfterLoginActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-		if(mXmppService != null && !mXmppService.getConnection().isConnected()) {
-			mXmppService.reconnect();
-		}
+//		if(mXmppService != null && !mXmppService.getConnection().isConnected()) {
+//			mXmppService.reconnect();
+//		}
 		super.onResume();
 	}
 	

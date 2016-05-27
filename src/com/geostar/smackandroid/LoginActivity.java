@@ -1,6 +1,10 @@
 package com.geostar.smackandroid;
 
+import java.io.IOException;
+
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import android.app.Activity;
 import android.app.Service;
@@ -20,6 +24,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.geostar.smackandroid.manager.login.ILoginManager;
+import com.geostar.smackandroid.manager.login.ILoginManager.OnLoginCallback;
+import com.geostar.smackandroid.manager.login.LoginManagerImpl;
+import com.geostar.smackandroid.service.NewXMPPService;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
@@ -32,7 +40,7 @@ public class LoginActivity extends Activity {
 	private EditText mUserNameEt,mPasswordEt;
 	private Button mSubmitBtn;
 	
-	private XMPPService mXmppService;
+	private NewXMPPService mXmppService;
 	
 	private Handler mHandler = new Handler(){
 
@@ -59,7 +67,7 @@ public class LoginActivity extends Activity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "onServiceConnected");
-			mXmppService = ((XMPPBinder)service).getService();
+			mXmppService = ((NewXMPPService.XMPPBinder)service).getService();
 		}
 
 		@Override
@@ -73,19 +81,25 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
-		startService(new Intent(this,XMPPService.class) );
-		bindService(new Intent(this,XMPPService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
+		startService(new Intent(this,NewXMPPService.class) );
+		bindService(new Intent(this,NewXMPPService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
 		
 		
 		mUserNameEt = (EditText) findViewById(R.id.et_username);
 		mPasswordEt = (EditText) findViewById(R.id.et_password);
 		mSubmitBtn = (Button) findViewById(R.id.btn_submit_or_reg);
-		mSubmitBtn.setOnClickListener(new OnClickListener() {
+		mSubmitBtn.setOnClickListener(new OnClickListener() 
+		{
 			
 			@Override
 			public void onClick(View v) {
 				if(mXmppService != null){
-					loginOrRegister();
+					try {
+						loginOrRegister();
+					} catch (SmackException | IOException | XMPPException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -93,29 +107,37 @@ public class LoginActivity extends Activity {
 	}
 
 
-	private void loginOrRegister() {
-		AbstractXMPPConnection conn = mXmppService.getConnection();
+	private void loginOrRegister() throws SmackException, IOException, XMPPException {
+		AbstractXMPPConnection conn = mXmppService.getXMPPConnection();
 		String name = mUserNameEt.getText().toString();
 		String passwd = mPasswordEt.getText().toString();
-		XMPPLoginCallback callback = new XMPPLoginCallback() {
+		
+		mXmppService.connectToXMPPServerUserDefaultSet(name,passwd);
+		
+		ILoginManager loginManager = (ILoginManager) mXmppService.getManager(NewXMPPService.LOGIN_MANAGER);
+		
+		if(loginManager == null){
+			System.out.println("------------------ not ready -------------");
+			return;
+		}
+		OnLoginCallback callback = new OnLoginCallback() {
 			
 			@Override
-			public void onLoginSuccess() {
+			public void onSuccess() {
 				mHandler.sendEmptyMessage(MSG_LOGIN_SUCCESS);
 			}
 			
 			@Override
-			public void onLoginFailed() {
+			public void onFailed() {
 				mHandler.sendEmptyMessage(MSG_LOGIN_FAILED);
 			}
 		};
-		mXmppService.login(name, passwd, callback);
+		loginManager.login(name, passwd, callback);
 	}
 	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}

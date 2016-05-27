@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import com.geostar.smackandroid.AfterLoginActivity;
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.service.NewXMPPService;
 
 public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener{
 	
@@ -52,8 +52,8 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
-		mService = ((XMPPBinder)service).getService();
-		mRoster = Roster.getInstanceFor(mService.getConnection());
+		mService = ((NewXMPPService.XMPPBinder)service).getService();
+		mRoster = Roster.getInstanceFor(mService.getXMPPConnection());
 		mRoster.addRosterListener(this);
 		
 		loadContactListToView();
@@ -61,7 +61,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 	private void loadContactListToView() {
 		mContactList = (ListView) getView().findViewById(R.id.listView);
-		if(mService != null && mService.getConnection() != null ){
+		if(mService != null && mService.getXMPPConnection() != null ){
 			List<RosterEntry> rosters = new ArrayList<RosterEntry>();
 			rosters.addAll(mRoster.getEntries());
 			ContactAdapter adapter = new ContactAdapter(rosters);
@@ -76,7 +76,6 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 	@Override
 	public void onResume() {
-		// TODO Auto-generated method stub
 		loadContactListToView();
 		super.onResume();
 	}
