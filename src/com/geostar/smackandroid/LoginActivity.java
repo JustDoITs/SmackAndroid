@@ -2,11 +2,6 @@ package com.geostar.smackandroid;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 
-import com.example.smackandroid.R;
-import com.geostar.smackandroid.service.XMPPService;
-import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
-import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
-
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
@@ -24,6 +19,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.geostar.smackandroid.service.XMPPService;
+import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
 public class LoginActivity extends Activity {
 
@@ -85,7 +84,9 @@ public class LoginActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				loginOrRegister();
+				if(mXmppService != null){
+					loginOrRegister();
+				}
 			}
 
 		});

@@ -1,7 +1,7 @@
 package com.geostar.smackandroid.frag;
 
-import android.app.Fragment;
 import android.content.ServiceConnection;
+import android.support.v4.app.Fragment;
 
 import com.geostar.smackandroid.AfterLoginActivity;
 import com.geostar.smackandroid.service.XMPPService;

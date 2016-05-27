@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.smackandroid"
+    package="com.geostar.smackandroid"
     android:versionCode="1"
     android:versionName="1.0" >
     
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
 
-       com.geostar.smackandroid.service.XMPPServiceme=".service.XMPPService" />
+       <service android:name=".service.XMPPService"></service>
 
         <activity
             android:name="com.geostar.smackandroid.AfterLoginActivity"

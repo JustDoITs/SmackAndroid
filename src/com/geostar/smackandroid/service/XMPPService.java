@@ -31,7 +31,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.smackandroid.R;
+import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.xmpp.IXMPPFunc;
 import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 

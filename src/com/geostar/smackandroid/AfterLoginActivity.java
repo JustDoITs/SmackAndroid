@@ -2,22 +2,21 @@ package com.geostar.smackandroid;
 
 import java.util.Locale;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.smackandroid.R;
 import com.geostar.smackandroid.frag.BaseFragment;
 import com.geostar.smackandroid.frag.ContactFragment;
 import com.geostar.smackandroid.frag.MessageFragment;
@@ -25,7 +24,7 @@ import com.geostar.smackandroid.frag.SettingsFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
-public class AfterLoginActivity extends Activity {
+public class AfterLoginActivity extends FragmentActivity {
 
 	SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -59,8 +58,8 @@ public class AfterLoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_after_login);
-
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+		
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);

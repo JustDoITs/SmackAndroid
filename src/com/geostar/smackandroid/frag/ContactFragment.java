@@ -21,8 +21,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.smackandroid.R;
 import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
 public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener{
@@ -61,13 +61,12 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 	private void loadContactListToView() {
 		mContactList = (ListView) getView().findViewById(R.id.listView);
-		if(mService.getConnection() == null ){
-			return;
+		if(mService != null && mService.getConnection() != null ){
+			List<RosterEntry> rosters = new ArrayList<RosterEntry>();
+			rosters.addAll(mRoster.getEntries());
+			ContactAdapter adapter = new ContactAdapter(rosters);
+			mContactList.setAdapter(adapter);
 		}
-		List<RosterEntry> rosters = new ArrayList<RosterEntry>();
-		rosters.addAll(mRoster.getEntries());
-		ContactAdapter adapter = new ContactAdapter(rosters);
-		mContactList.setAdapter(adapter);
 	}
 
 	@Override
@@ -75,7 +74,12 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		
 	}
 
-	
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		loadContactListToView();
+		super.onResume();
+	}
 	
 	/* 
 	 * ������ı� 
@@ -142,7 +146,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 			
 			RosterEntry entry = getItem(position);
 			holder.user.setText(entry.getUser());
-			//��ȡ�û�״̬
+			
 			Presence pre = ContactFragment.this.mRoster.getPresence(entry.getUser());
 			String nickname = TextUtils.isEmpty(entry.getName())?"":("("+ entry.getName()+")" );
 			holder.state.setText(nickname + (pre.getStatus()==null?"":pre.getStatus()));
