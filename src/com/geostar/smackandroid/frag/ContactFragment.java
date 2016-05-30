@@ -82,19 +82,9 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		if(getXMPPService() != null && getXMPPService().getConnection() != null ){
 			mRostersData = new ArrayList<RosterEntry>();
 			mRostersData.addAll(mRoster.getEntries());
-			
-//			if(mRostersData == null){
-//				mRostersData = data;
-//			}else{
-//				mRostersData.clear();
-//				mRostersData.addAll(data);
-//			}
-//			if(mAdapter == null){
-				mAdapter = new ContactAdapter(mRostersData);
-				getListView().setAdapter(mAdapter);
-//			}else{
-//				mAdapter.notifyDataSetChanged();
-//			}
+
+			mAdapter = new ContactAdapter(mRostersData);
+			getListView().setAdapter(mAdapter);
 		}
 	}
 

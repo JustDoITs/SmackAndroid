@@ -1,22 +1,60 @@
 package com.geostar.smackandroid;
 
-import android.app.Activity;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smackx.xdatalayout.packet.DataLayout.Text;
+
+import android.app.ListActivity;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
-public class ChatActivity extends Activity {
+/**
+ * 聊天
+ * @author jianghanghang
+ *
+ */
+public class ChatActivity extends ListActivity {
 
+	protected static final String TAG = "ChatActivity";
 	private XMPPService mXmppService;
+	/**聊天对象 */
+	private String mChatOjb;
+	private ChatAdapter mAdapter;
+	
+	private List<Message> mMsgLists = new ArrayList<Message>();
+	
+	private EditText mMsgInput;
+	private Button mMsgSendBtn;
 	
 	private  XMPPService getXmppService(){
 		return mXmppService;
@@ -32,12 +70,52 @@ public class ChatActivity extends Activity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
-			
+			registerMessageListener();
 		}
 	};
 	
-	private String mChatOjb;
+	private void registerMessageListener() {
+		// TODO Auto-generated method stub
+		StanzaListener Messagelistener = new StanzaListener() {
+            @Override
+            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
+                if(packet instanceof org.jivesoftware.smack.packet.Message){
+                    final org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
+//                    Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
+                    getListView().post(new Runnable() {
+						
+						@Override
+						public void run() {
+							addFromMsgToList(msg);
+						}
+					});
+                }
+            }
+
+
+        };
+        mXmppService.getXMPPConnection().addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
+	}
 	
+
+
+	
+	/** 刷新List */
+	protected void initListView() {
+		mAdapter = new ChatAdapter(this, mMsgLists);
+		getListView().setAdapter(mAdapter);
+	}
+	
+	private void addFromMsgToList(Message msg) {
+		if(getListView().getAdapter() == null){
+			initListView();
+		}
+		mMsgLists.add(msg);
+		mAdapter.notifyDataSetChanged();
+		getListView().setSelection(mMsgLists.size()-1);
+	}
+	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,19 +134,135 @@ public class ChatActivity extends Activity {
 		bindService(new Intent(this,XMPPService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
 	
 		getActionBar().setTitle(mChatOjb);
-		loadChatView();
-	}
-
-	
-	
-	
-	private void loadChatView() {
-		// TODO Auto-generated method stub
+		initListView();
+		
+		mMsgSendBtn = (Button) findViewById(R.id.btn_send_msg);
+		mMsgInput = (EditText) findViewById(R.id.et_input_msg);
+		mMsgSendBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				sendMessage();
+			}
+		});
 		
 	}
 
 
 
+	
+
+	/** 
+	 * 发送消息
+	 */
+	protected void sendMessage() {
+		// TODO Auto-generated method stub
+		if(getXmppService() != null && getXmppService().getConnection() != null ){
+		}else{
+			Toast.makeText(this, "您已离线，请重新登录后发送", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		String msg = mMsgInput.getText().toString();
+		if(TextUtils.isEmpty(msg)){
+			Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		Message sendMsg = new Message();
+		sendMsg.setBody(msg);
+		mMsgLists.add(sendMsg);
+		mAdapter.notifyDataSetChanged();
+		getListView().setSelection(mMsgLists.size()-1);
+		
+		// 发送消息
+		ChatManager chatManager = ChatManager.getInstanceFor(getXmppService().getConnection());
+	
+		Chat newChat  =	chatManager.createChat(mChatOjb);
+		try {
+			newChat.sendMessage(sendMsg);
+		} catch (NotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mMsgInput.setText("");
+		
+	}
+
+
+
+
+	class ChatAdapter extends BaseAdapter{
+		
+		private static final int MAX_MSG_SIZE = 100;
+		
+		private List<Message> mMsgDatas;
+		
+		private LayoutInflater mInflater;
+		
+		
+		public ChatAdapter(Context context,List<Message> mMsgDatas) {
+			super();
+			this.mMsgDatas = mMsgDatas;
+			mInflater = LayoutInflater.from(context);
+		}
+
+		@Override
+		public int getCount() {
+			return mMsgDatas.size();
+		}
+
+		@Override
+		public Message getItem(int position) {
+			return mMsgDatas.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			
+			ViewHolder holder = null;
+			if(convertView == null){
+				convertView = mInflater.inflate(R.layout.chat_item_all, null);
+				holder= new ViewHolder(convertView);
+				convertView.setTag(holder);
+			}else{
+				holder = (ViewHolder) convertView.getTag();
+			}
+			Message msg = getItem(position);
+			if(msg.getTo().contains(mChatOjb)){
+				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.VISIBLE);
+				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.GONE);
+				holder.msgMine.setText(msg.getBody());
+			}else{
+				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.GONE);
+				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.VISIBLE);
+				holder.msgOther.setText(msg.getBody());
+			}
+			return convertView;
+		}
+		
+		class ViewHolder {
+			
+			ImageView iconOther,iconMine;
+			TextView msgOther,msgMine;
+			
+			public ViewHolder(View convertView) {
+				iconMine =(ImageView) convertView.findViewById(R.id.chat_msg_mine).findViewById(R.id.iv_icon);
+				msgMine = (TextView) convertView.findViewById(R.id.chat_msg_mine).findViewById(R.id.tv_msg_content);
+				
+				iconOther =(ImageView) convertView.findViewById(R.id.chat_msg_others).findViewById(R.id.iv_icon);
+				msgOther = (TextView) convertView.findViewById(R.id.chat_msg_others).findViewById(R.id.tv_msg_content);
+			}
+		}
+		
+	}
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
