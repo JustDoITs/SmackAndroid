@@ -7,12 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 
 public class MessageFragment extends BaseFragment {
 
-	public MessageFragment(AfterLoginActivity activity) {
+	public MessageFragment(MainActivity activity) {
 		super(activity);
 	}
 

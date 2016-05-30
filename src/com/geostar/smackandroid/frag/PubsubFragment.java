@@ -7,12 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 
 public class PubsubFragment extends BaseFragment {
 
-	public PubsubFragment(AfterLoginActivity activity) {
+	public PubsubFragment(MainActivity activity) {
 		super(activity);
 	}
 

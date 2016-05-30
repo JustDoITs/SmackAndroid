@@ -31,7 +31,7 @@
        <service android:name=".service.XMPPService"></service>
 
         <activity
-            android:name="com.geostar.smackandroid.AfterLoginActivity"
+            android:name="com.geostar.smackandroid.MainActivity"
             android:label="@string/title_activity_after_login" >
         </activity>
     </application>

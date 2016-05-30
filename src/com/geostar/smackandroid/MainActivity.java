@@ -24,7 +24,7 @@ import com.geostar.smackandroid.frag.PubsubFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
-public class AfterLoginActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
 
 	private SectionsPagerAdapter mSectionsPagerAdapter;
 

@@ -21,7 +21,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.geostar.smackandroid.AfterLoginActivity;
+import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
@@ -34,7 +34,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		void OnContactClick(RosterEntry contact);
 	}
 
-	public ContactFragment(AfterLoginActivity activity) {
+	public ContactFragment(MainActivity activity) {
 		super(activity);
 	}
 
