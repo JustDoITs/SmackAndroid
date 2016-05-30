@@ -2,16 +2,12 @@
 <resources>
 
     <string name="app_name">SmackAndroid</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="server_ip_address">192.168.42.154</string>
-    <string name="server_port">5222</string>
-    <string name="server_name">geo-hanly</string>
+    <string name="action_settings">设置</string>
     <string name="defalut_resource_name">Nexus5</string>
     <string name="default_login_state">Call Me!!!</string>
     <string name="title_activity_after_login">AfterLoginActivity</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="contacts">联系人</string>
+    <string name="chat_and_messages">聊天列表</string>
+    <string name="pub_and_sub">发布订阅</string>
 
 </resources>

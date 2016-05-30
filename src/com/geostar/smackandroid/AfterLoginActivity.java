@@ -20,15 +20,15 @@ import android.view.MenuItem;
 import com.geostar.smackandroid.frag.BaseFragment;
 import com.geostar.smackandroid.frag.ContactFragment;
 import com.geostar.smackandroid.frag.MessageFragment;
-import com.geostar.smackandroid.frag.SettingsFragment;
+import com.geostar.smackandroid.frag.PubsubFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
 public class AfterLoginActivity extends FragmentActivity {
 
-	SectionsPagerAdapter mSectionsPagerAdapter;
+	private SectionsPagerAdapter mSectionsPagerAdapter;
 
-	ViewPager mViewPager;
+	private ViewPager mViewPager;
 	
 	private XMPPService mXmppService;
 	
@@ -63,10 +63,12 @@ public class AfterLoginActivity extends FragmentActivity {
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(0));
 		mViewPager
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
+						getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(position));
 					}
 				});
 		
@@ -104,11 +106,11 @@ public class AfterLoginActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				return getString(R.string.contacts).toUpperCase(l);
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return getString(R.string.chat_and_messages).toUpperCase(l);
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return getString(R.string.pub_and_sub).toUpperCase(l);
 			}
 			return null;
 		}
@@ -124,7 +126,7 @@ public class AfterLoginActivity extends FragmentActivity {
 			frag = new MessageFragment(this);
 			break;
 		case 2:
-			frag = new SettingsFragment(this);
+			frag = new PubsubFragment(this);
 			break;
 		default:
 			break;

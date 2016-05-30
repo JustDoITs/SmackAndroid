@@ -10,16 +10,16 @@ import android.view.ViewGroup;
 import com.geostar.smackandroid.AfterLoginActivity;
 import com.geostar.smackandroid.R;
 
-public class SettingsFragment extends BaseFragment {
+public class PubsubFragment extends BaseFragment {
 
-	public SettingsFragment(AfterLoginActivity activity) {
+	public PubsubFragment(AfterLoginActivity activity) {
 		super(activity);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.settings, null);
+		return inflater.inflate(R.layout.pub_sub_layout, null);
 	}
 
 	@Override
