@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="server_ip_address">192.168.42.154</string>
-    <string name="server_name">geo-hanly</string>
-    <integer name="server_port">5222</integer>
-
-</resources>
