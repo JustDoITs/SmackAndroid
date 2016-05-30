@@ -37,7 +37,10 @@ import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
 public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback {
 
-    private static final String TAG = "XMPPService";
+	private static final String TAG = "XMPPService";
+	
+	ExecutorService mExecService = Executors.newFixedThreadPool(2);
+	
     private AbstractXMPPConnection mXmppConnection;
     private String mUsername,mPassword;
 
@@ -45,14 +48,12 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
     private Chat mCurChat;
     private List<String> mChatThreads = new ArrayList<String>();
 
-    ExecutorService mExecService = Executors.newFixedThreadPool(3);
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        username = intent.getStringExtra("username");
 //        password = intent.getStringExtra("password");
 //        if(!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
-//            // ���Ե�¼
 //            login(username,password,this);
 //        }
         return super.onStartCommand(intent, flags, startId);
@@ -113,7 +114,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
             @Override
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
                 sendMsgNotification();
-                Log.d(TAG,"���յ�һ����Ϣ PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
+                Log.d(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
             }
         };
         StanzaListener Messagelistener = new StanzaListener() {
@@ -122,7 +123,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
                 sendMsgNotification();
                 if(packet instanceof org.jivesoftware.smack.packet.Message){
                     org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
-                    Log.d(TAG,"���յ�һ����Ϣ - MessageWithBodiesFilter : " +  msg.getBody());
+                    Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
                 }
             }
         };
@@ -173,7 +174,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
      * ��¼
      * @param usrName
      * @param pwd
-     * @param callback ��¼����ص�����Ҫ�ڻص������в���UI
+     * @param callback 不可执行UI操作
      */
     public void login(final String usrName,final String pwd,final XMPPLoginCallback callback) {
         Runnable work = new Runnable() {
@@ -233,7 +234,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
 
     /**
-     * ������Ϣ
+     * 发送消息
      * @param toUser
      * @param msg
      */

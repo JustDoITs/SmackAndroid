@@ -19,7 +19,7 @@ import android.view.MenuItem;
 
 import com.geostar.smackandroid.frag.BaseFragment;
 import com.geostar.smackandroid.frag.ContactFragment;
-import com.geostar.smackandroid.frag.MessageFragment;
+import com.geostar.smackandroid.frag.ChatFragment;
 import com.geostar.smackandroid.frag.PubsubFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
@@ -123,7 +123,7 @@ public class MainActivity extends FragmentActivity {
 			frag = new ContactFragment(this);
 			break;
 		case 1:
-			frag = new MessageFragment(this);
+			frag = new ChatFragment(this);
 			break;
 		case 2:
 			frag = new PubsubFragment(this);

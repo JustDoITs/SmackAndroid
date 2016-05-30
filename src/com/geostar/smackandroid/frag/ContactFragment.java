@@ -13,6 +13,8 @@ import org.jivesoftware.smack.roster.RosterListener;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +27,14 @@ import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
-public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener{
+public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener,OnRefreshListener{
 	
 	private ListView mContactList;
 	private Roster mRoster;
+	private SwipeRefreshLayout mSwipeRefreshLayout;
+	
+	private List<RosterEntry> mRostersData = new ArrayList<RosterEntry>();
+	private ContactAdapter mAdapter;
 	
 	public interface OnContactClick{
 		void OnContactClick(RosterEntry contact);
@@ -47,7 +53,10 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.contacts, null);
+		View v = inflater.inflate(R.layout.contacts, null);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
+		return v;
 	}
 
 	@Override
@@ -59,13 +68,17 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		loadContactListToView();
 	}
 
+
 	private void loadContactListToView() {
-		mContactList = (ListView) getView().findViewById(R.id.listView);
 		if(mService != null && mService.getConnection() != null ){
-			List<RosterEntry> rosters = new ArrayList<RosterEntry>();
-			rosters.addAll(mRoster.getEntries());
-			ContactAdapter adapter = new ContactAdapter(rosters);
-			mContactList.setAdapter(adapter);
+			mRostersData = new ArrayList<RosterEntry>();
+			mRostersData.addAll(mRoster.getEntries());
+			if(mAdapter == null){
+				mAdapter = new ContactAdapter(mRostersData);
+				getListView().setAdapter(mAdapter);
+			}else{
+				mAdapter.notifyDataSetChanged();
+			}
 		}
 	}
 
@@ -81,32 +94,37 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		super.onResume();
 	}
 	
-	/* 
-	 * ������ı� 
-	 */
 	
 	@Override
 	public void entriesAdded(Collection<String> addresses) {
 		// TODO Auto-generated method stub
-		
+		loadContactListToView();
 	}
 
 	@Override
 	public void entriesUpdated(Collection<String> addresses) {
 		// TODO Auto-generated method stub
+		loadContactListToView();
 		
 	}
 
 	@Override
 	public void entriesDeleted(Collection<String> addresses) {
 		// TODO Auto-generated method stub
+		loadContactListToView();
 		
 	}
 
 	@Override
 	public void presenceChanged(Presence presence) {
 		// TODO Auto-generated method stub
-		
+		getListView().post(new Runnable() {
+			
+			@Override
+			public void run() {
+				loadContactListToView();
+			}
+		});
 	}
 	
 	class ContactAdapter extends BaseAdapter{
@@ -168,7 +186,15 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	@Override
 	public void processPresence(Presence presence) {
 		// TODO Auto-generated method stub
-		
+		loadContactListToView();
+	}
+
+	
+	@Override
+	public void onRefresh() {
+		// TODO Auto-generated method stub
+		loadContactListToView();
+		mSwipeRefreshLayout.setRefreshing(false);
 	}
 
 }
