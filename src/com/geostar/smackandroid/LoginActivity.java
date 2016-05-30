@@ -20,9 +20,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.geostar.smackandroid.service.XMPPLoginCallback;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
-import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
 public class LoginActivity extends Activity {
 
@@ -46,7 +46,8 @@ public class LoginActivity extends Activity {
 				finish();
 				break;
 			case MSG_LOGIN_FAILED:
-				Toast.makeText(LoginActivity.this, "登陆失败，继续潜水", Toast.LENGTH_SHORT).show();
+				Exception e = (Exception) msg.obj;
+				Toast.makeText(LoginActivity.this, "登陆失败，请重试：" + e.getMessage(), Toast.LENGTH_SHORT).show();
 				break;
 			default:
 				break;
@@ -94,7 +95,7 @@ public class LoginActivity extends Activity {
 
 
 	private void loginOrRegister() {
-		AbstractXMPPConnection conn = mXmppService.getConnection();
+		AbstractXMPPConnection conn = mXmppService.getXMPPConnection();
 		String name = mUserNameEt.getText().toString();
 		String passwd = mPasswordEt.getText().toString();
 		XMPPLoginCallback callback = new XMPPLoginCallback() {
@@ -105,8 +106,11 @@ public class LoginActivity extends Activity {
 			}
 			
 			@Override
-			public void onLoginFailed() {
-				mHandler.sendEmptyMessage(MSG_LOGIN_FAILED);
+			public void onLoginFailed(Exception e) {
+				Message msg = new Message();
+				msg.what = MSG_LOGIN_FAILED;
+				msg.obj = e ;
+				mHandler.sendMessage(msg);
 			}
 		};
 		mXmppService.login(name, passwd, callback);

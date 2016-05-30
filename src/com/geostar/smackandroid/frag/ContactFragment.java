@@ -71,7 +71,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	public void onServiceConnected(ComponentName name, IBinder service) {
 //		getXMPPService() = ((XMPPBinder)service).getService();
 		super.onServiceConnected(name, service);
-		mRoster = Roster.getInstanceFor(getXMPPService().getConnection());
+		mRoster = Roster.getInstanceFor(getXMPPService().getXMPPConnection());
 		mRoster.addRosterListener(this);
 		
 		loadContactListToView();
@@ -79,7 +79,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 
 	private void loadContactListToView() {
-		if(getXMPPService() != null && getXMPPService().getConnection() != null ){
+		if(getXMPPService() != null && getXMPPService().getXMPPConnection() != null ){
 			mRostersData = new ArrayList<RosterEntry>();
 			mRostersData.addAll(mRoster.getEntries());
 

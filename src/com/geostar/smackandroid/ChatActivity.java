@@ -11,7 +11,6 @@ import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smackx.xdatalayout.packet.DataLayout.Text;
 
 import android.app.ListActivity;
 import android.app.Service;
@@ -21,6 +20,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,7 +44,7 @@ import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
  * @author jianghanghang
  *
  */
-public class ChatActivity extends ListActivity {
+public class ChatActivity extends ListActivity implements OnRefreshListener {
 
 	protected static final String TAG = "ChatActivity";
 	private XMPPService mXmppService;
@@ -55,6 +56,8 @@ public class ChatActivity extends ListActivity {
 	
 	private EditText mMsgInput;
 	private Button mMsgSendBtn;
+	
+	private SwipeRefreshLayout mSwipeRefreshLayout;
 	
 	private  XMPPService getXmppService(){
 		return mXmppService;
@@ -86,7 +89,7 @@ public class ChatActivity extends ListActivity {
 						
 						@Override
 						public void run() {
-							addFromMsgToList(msg);
+							receiverANewMessage(msg);
 						}
 					});
                 }
@@ -106,7 +109,7 @@ public class ChatActivity extends ListActivity {
 		getListView().setAdapter(mAdapter);
 	}
 	
-	private void addFromMsgToList(Message msg) {
+	private void receiverANewMessage(Message msg) {
 		if(getListView().getAdapter() == null){
 			initListView();
 		}
@@ -131,6 +134,9 @@ public class ChatActivity extends ListActivity {
 		}
 		
 		setContentView(R.layout.chat_room_layout);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
+		
 		bindService(new Intent(this,XMPPService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
 	
 		getActionBar().setTitle(mChatOjb);
@@ -158,7 +164,7 @@ public class ChatActivity extends ListActivity {
 	 */
 	protected void sendMessage() {
 		// TODO Auto-generated method stub
-		if(getXmppService() != null && getXmppService().getConnection() != null ){
+		if(getXmppService() != null && getXmppService().getXMPPConnection() != null ){
 		}else{
 			Toast.makeText(this, "您已离线，请重新登录后发送", Toast.LENGTH_SHORT).show();
 			return;
@@ -176,9 +182,10 @@ public class ChatActivity extends ListActivity {
 		getListView().setSelection(mMsgLists.size()-1);
 		
 		// 发送消息
-		ChatManager chatManager = ChatManager.getInstanceFor(getXmppService().getConnection());
+		ChatManager chatManager = ChatManager.getInstanceFor(getXmppService().getXMPPConnection());
 	
 		Chat newChat  =	chatManager.createChat(mChatOjb);
+//		getXmppService().addChatThread(newChat);// nouse
 		try {
 			newChat.sendMessage(sendMsg);
 		} catch (NotConnectedException e) {
@@ -285,11 +292,29 @@ public class ChatActivity extends ListActivity {
 	
 	
 	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		if(getXmppService() != null && getXmppService() !=null && !getXmppService().getXMPPConnection().isConnected()){
+			getXmppService().reconnect();
+		}
+		super.onResume();
+	}
+	
+	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		if(mXmppService != null && mServiceConnection != null){
 			unbindService(mServiceConnection);
 		}
 		super.onDestroy();
+	}
+
+
+
+
+	@Override
+	public void onRefresh() {
+		// TODO 刷新动作
+		mSwipeRefreshLayout.setRefreshing(false);
 	}
 }

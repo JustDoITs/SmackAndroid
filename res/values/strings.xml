@@ -15,5 +15,6 @@
     <string name="dissubscrible_it">取消订阅</string>
     <string name="send">发送</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_pub_view">PubViewActivity</string>
 
 </resources>

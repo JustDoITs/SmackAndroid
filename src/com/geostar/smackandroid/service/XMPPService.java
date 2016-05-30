@@ -20,7 +20,6 @@ import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
 import org.jivesoftware.smack.filter.PresenceTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -32,10 +31,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.xmpp.IXMPPFunc;
-import com.geostar.smackandroid.xmpp.XMPPLoginCallback;
 
-public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback {
+public class XMPPService extends Service {
 
 	private static final String TAG = "XMPPService";
 	
@@ -47,6 +44,8 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
     private final IBinder mBinder = new XMPPBinder();
     private Chat mCurChat;
     private List<String> mChatThreads = new ArrayList<String>();
+    
+    private List<Chat> mAllChats = new ArrayList<Chat>();
 
 
     @Override
@@ -64,16 +63,6 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
         // TODO: Return the communication channel to the service.
         Log.d(TAG,"Onbind");
         return mBinder;
-    }
-
-    @Override
-    public void onLoginSuccess() {
-        Log.d(TAG,"First Login success!!!");
-    }
-
-    @Override
-    public void onLoginFailed() {
-        Log.d(TAG,"First Login failed!!!");
     }
 
     public class XMPPBinder extends Binder {
@@ -138,19 +127,16 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
     }
 
-    @Override
     public AbstractXMPPConnection getXMPPConnection() {
         return mXmppConnection;
     }
 
-    @Override
     public void connect() {
         if(!TextUtils.isEmpty(mUsername) && !TextUtils.isEmpty(mPassword)){
-            login(mUsername,mPassword,this);
+            login(mUsername,mPassword,null);
         }
     }
 
-    @Override
     public void reconnect(){
     	mExecService.execute(new Runnable() {
 			@Override
@@ -171,7 +157,7 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
 
 
     /**
-     * ��¼
+     * Login
      * @param usrName
      * @param pwd
      * @param callback 不可执行UI操作
@@ -180,51 +166,31 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
         Runnable work = new Runnable() {
             @Override
             public void run() {
-                try {
-                    connect(usrName,pwd);
-                    login(usrName,pwd);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                } catch (SmackException e) {
-                    e.printStackTrace();
-                }
+				try {
+					connect(usrName, pwd);
+					login(usrName, pwd);
+				} catch (IOException | InterruptedException | XMPPException
+						| SmackException e) {
+					e.printStackTrace();
+					// TODO: 登录失败处理
+					if (callback != null) {
+						callback.onLoginFailed(e);
+					}
+					return;
+				}
                 if(mXmppConnection.isConnected() && callback!=null) {
                     callback.onLoginSuccess();
-                }else{
-                    callback.onLoginFailed();
                 }
             }
         };
         mExecService.execute(work);
     }
 
-    @Override
-    public Roster getRoster() {
-        Roster roster = Roster.getInstanceFor(mXmppConnection);
-        return roster;
-    }
 
-
-    public AbstractXMPPConnection getConnection(){
-        return mXmppConnection;
-    }
-
-    private void login(String usrName,String password) throws SmackException.NotConnectedException, InterruptedException {
+    private void login(String usrName,String password) throws XMPPException, SmackException, IOException  {
         mUsername = usrName;
         this.mPassword = password;
-        try {
-            mXmppConnection.login(usrName, password);
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+		mXmppConnection.login(usrName, password);
         Presence presence = new Presence(Presence.Type.available,
                 getResources().getString(R.string.default_login_state), 1, Presence.Mode.available);
         mXmppConnection.sendStanza(presence);
@@ -281,6 +247,20 @@ public class XMPPService extends Service implements  IXMPPFunc,XMPPLoginCallback
             }
         }
     };
+    
+    public void addChatThread(Chat chat){
+    	if(!mChatThreads.contains(chat.getThreadID())){
+    		mAllChats.add(chat);
+    		mChatThreads.add(chat.getThreadID());
+    		
+    	}
+    }
+    
+    
+    public List<Chat> getAllChatThread(){
+    	return mAllChats;
+    }
+    
 
 }
 

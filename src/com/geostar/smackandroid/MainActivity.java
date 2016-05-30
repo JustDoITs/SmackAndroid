@@ -137,8 +137,8 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.after_login, menu);
-		return true;
+//		getMenuInflater().inflate(R.menu.after_login, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-		if(mXmppService != null && !mXmppService.getConnection().isConnected()) {
+		if(mXmppService != null && !mXmppService.getXMPPConnection().isConnected()) {
 			mXmppService.reconnect();
 		}
 		super.onResume();

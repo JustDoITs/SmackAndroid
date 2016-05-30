@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.xmpp;
+package com.geostar.smackandroid.service;
 
 
 /**
@@ -8,6 +8,6 @@ public interface XMPPLoginCallback {
 
     public void onLoginSuccess();
 
-    public void onLoginFailed();
+    public void onLoginFailed(Exception e);
 
 }

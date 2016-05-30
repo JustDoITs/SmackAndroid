@@ -13,7 +13,6 @@ import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
-import org.jivesoftware.smackx.pubsub.packet.PubSub;
 
 import android.content.ComponentName;
 import android.os.Bundle;
@@ -22,10 +21,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -70,6 +70,8 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		setHasOptionsMenu(true);
+		
 		try {
 			loadMySubs();
 		} catch (NoResponseException | XMPPErrorException
@@ -306,7 +308,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 
 		if(pubSubMgr == null){
-			pubSubMgr = new PubSubManager(getXMPPService().getConnection());
+			pubSubMgr = new PubSubManager(getXMPPService().getXMPPConnection());
 		}
 		LeafNode node = null;
 		try {
@@ -320,6 +322,13 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		// TODO Auto-generated method stub
+		inflater.inflate(R.menu.pub_sub_menu, menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
 	

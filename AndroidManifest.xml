@@ -42,6 +42,10 @@
             android:name=".ChatActivity"
             android:label="@string/title_activity_chat" >
         </activity>
+        <activity
+            android:name=".PubViewActivity"
+            android:label="@string/title_activity_pub_view" >
+        </activity>
     </application>
 
 </manifest>
