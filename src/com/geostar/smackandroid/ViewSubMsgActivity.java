@@ -8,19 +8,15 @@ import java.util.List;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
-import org.jivesoftware.smackx.pubsub.AccessModel;
-import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.Item;
 import org.jivesoftware.smackx.pubsub.ItemPublishEvent;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.PayloadItem;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
-import org.jivesoftware.smackx.pubsub.PublishModel;
 import org.jivesoftware.smackx.pubsub.SimplePayload;
 import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
-import org.jivesoftware.smackx.xdata.packet.DataForm;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -43,8 +39,8 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.geostar.smackandroid.adapter.SubsAdapter;
-import com.geostar.smackandroid.adapter.SubsAdapter.ContentProv;
+import com.geostar.smackandroid.adapter.SubMessageAdapter;
+import com.geostar.smackandroid.adapter.SubMessageAdapter.ContentProv;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
@@ -62,12 +58,11 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 	
 	private XMPPService mXmppService;
 	
-	
 	private List<Item> mSubMessages = new ArrayList<Item>();
 	
-	private SubsAdapter<Item> adapter ;
+	private SubMessageAdapter<Item> adapter ;
 	
-	SwipeRefreshLayout mSwipeFresh;
+	private SwipeRefreshLayout mSwipeFresh;
 	
 	private PubSubManager mPubsubManager ;
 	/** 订阅状态，订阅信息  */
@@ -101,10 +96,7 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 					if(items!= null && items.getItems().size() > 0){
 						Log.d(TAG,"-------------------- handlePublishedItems: size=" +
 									items.getItems().size() + "; "+ items.getItems().get(0).toString());
-//						List<Item> newItems = new ArrayList<Item>(items.getItems().size());
-//						Collections.copy(newItems, items.getItems());
-//						Collections.reverse(newItems);
-						mSubMessages.addAll(items.getItems());
+						mSubMessages.addAll(0,items.getItems());
 						// 倒序显示，最近的在最上面
 						getListView().post(new Runnable() {
 							
@@ -121,6 +113,7 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 			try {
 				mSubcription = node.subscribe(mXmppService.getXMPPConnection().getUser());
 				Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
+				refreshSubMessages();
 //				Subscription	subscribe(String jid, SubscribeForm subForm)
 //				The user subscribes to the node using the supplied jid and subscription options.
 			} catch (NoResponseException | XMPPErrorException
@@ -129,8 +122,6 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 				e.printStackTrace();
 			}
 		}
-		
-
 	};
 	
 
@@ -152,17 +143,15 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 		
 		Intent intent = new Intent(this,XMPPService.class);
 		bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
-		adapter = new SubsAdapter<Item>(this,mSubMessages,new ContentProv<Item>() {
+		adapter = new SubMessageAdapter<Item>(this,mSubMessages,new ContentProv<Item>() {
 
 			@Override
 			public String getText1(Item obj) {
-				// TODO Auto-generated method stub
 				return obj.getId();
 			}
 
 			@Override
 			public String getText2(Item obj) {
-				// TODO Auto-generated method stub
 				return obj.toString();
 			}
 
@@ -171,6 +160,7 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 				// TODO Auto-generated method stub
 				return null;
 			}
+			
 		});
 		getListView().setAdapter(adapter);
 	}
@@ -277,19 +267,10 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 	 */
 	private void sendTestNodeData(String msg,String node) {
 		if(mPubsubManager == null) return;
-		// Create the node
 		try {
-//			LeafNode leaf = mgr.createNode("测试订阅节点");
 			LeafNode leaf = mPubsubManager.getNode(node);
-//			ConfigureForm form = new ConfigureForm(DataForm.Type.submit);
-//			form.setAccessModel(AccessModel.open);
-//			form.setDeliverPayloads(true);
-//			form.setNotifyRetract(true);
-//			form.setSubscribe(true);
-//			form.setPersistentItems(true);
-//			form.setPublishModel(PublishModel.open);
-//			leaf.sendConfigurationForm(form);
 			leaf.send(new PayloadItem(msg ,
+					// TODO: Payload .....
 					new SimplePayload("msg", "pubsub:msg:state", "I m ok ")));
 			
 		} catch (NoResponseException | XMPPErrorException

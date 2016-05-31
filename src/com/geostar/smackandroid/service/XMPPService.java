@@ -11,15 +11,11 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatMessageListener;
-import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
-import org.jivesoftware.smack.filter.PresenceTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -47,14 +43,17 @@ public class XMPPService extends Service {
     
     private List<Chat> mAllChats = new ArrayList<Chat>();
 
+    @Override
+    public void onCreate() {
+    	// TODO Auto-generated method stub
+    	Log.d(TAG,"usrName:" + mUsername);
+    	super.onCreate();
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        username = intent.getStringExtra("username");
-//        password = intent.getStringExtra("password");
-//        if(!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
-//            login(username,password,this);
-//        }
+    	
+    	Log.d(TAG,"usrName:" + mUsername);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -74,7 +73,6 @@ public class XMPPService extends Service {
 
     private void connect(String usrName,String password) throws IOException, InterruptedException, XMPPException, SmackException {
     	SmackConfiguration.DEBUG = true;
-    	Log.d(TAG,"usrName:" + usrName +";password:" + password);
     	
         String hostIp = getResources().getString(R.string.server_ip_address);
         String serviceName = getResources().getString(R.string.server_name);
@@ -99,27 +97,27 @@ public class XMPPService extends Service {
 
     private void registerPacketListener() {
     	// StanzaListener Ϊ�첽�ģ�����PacketCollector Ϊͬ���� 
-        StanzaListener presenceTypelistener = new StanzaListener() {
-            @Override
-            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
-                sendMsgNotification();
-                Log.d(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
-            }
-        };
-        StanzaListener Messagelistener = new StanzaListener() {
-            @Override
-            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
-                sendMsgNotification();
-                if(packet instanceof org.jivesoftware.smack.packet.Message){
-                    org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
-                    Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
-                }
-            }
-        };
-//        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
-       //  MessageWithBodiesFilter.INSTANCE��ForEveryMessage.INSTANCE Ϊ��ͬ����Ϣ������
-        mXmppConnection.addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
-        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.AVAILABLE);
+//        StanzaListener presenceTypelistener = new StanzaListener() {
+//            @Override
+//            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
+//                sendMsgNotification();
+//                Log.d(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
+//            }
+//        };
+//        StanzaListener Messagelistener = new StanzaListener() {
+//            @Override
+//            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
+//                sendMsgNotification();
+//                if(packet instanceof org.jivesoftware.smack.packet.Message){
+//                    org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
+//                    Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
+//                }
+//            }
+//        };
+////        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
+//       //  MessageWithBodiesFilter.INSTANCE��ForEveryMessage.INSTANCE Ϊ��ͬ����Ϣ������
+//        mXmppConnection.addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
+//        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.AVAILABLE);
         
     }
 

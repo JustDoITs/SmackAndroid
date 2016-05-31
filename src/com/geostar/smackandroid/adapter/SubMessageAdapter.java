@@ -65,8 +65,10 @@ public class SubMessageAdapter<T> extends BaseAdapter {
 		if( mContentGetter != null ){
 			T item = getItem(position);
 			holder.title.setText(mContentGetter.getText1(item));
-			holder.desc.setText(mContentGetter.getText2(item));
+//			holder.desc.setText(mContentGetter.getText2(item));
+			holder.desc.setVisibility(View.GONE);
 			holder.addSubs.setOnClickListener(mContentGetter.getBtnClick(item));
+			holder.addSubs.setVisibility(View.GONE);
 		}
 		return convertView;
 	}

@@ -89,11 +89,11 @@ public class LoginActivity extends Activity {
 					loginOrRegister();
 				}
 			}
-
 		});
 	}
 
 
+	
 	private void loginOrRegister() {
 		AbstractXMPPConnection conn = mXmppService.getXMPPConnection();
 		String name = mUserNameEt.getText().toString();
