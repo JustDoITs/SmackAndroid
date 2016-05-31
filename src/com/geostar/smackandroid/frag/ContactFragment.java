@@ -213,7 +213,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 				return ;
 			}
 			Intent intent = new Intent(getActivity(),ChatActivity.class);
-			intent.putExtra("user",touser.getUser());
+			intent.putExtra("user",touser.getUser() );
 			startActivity(intent);
 		}
 		

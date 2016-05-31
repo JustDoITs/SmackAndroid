@@ -139,7 +139,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		
 		bindService(new Intent(this,XMPPService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
 	
-		getActionBar().setTitle(mChatOjb);
+		getActionBar().setTitle(mChatOjb.split("@")[0]);
 		initListView();
 		
 		mMsgSendBtn = (Button) findViewById(R.id.btn_send_msg);
