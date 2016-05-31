@@ -46,6 +46,10 @@
             android:name=".PubViewActivity"
             android:label="@string/title_activity_pub_view" >
         </activity>
+        <activity
+            android:name=".ViewSubMsgActivity"
+            android:label="@string/title_activity_view_sub_msg" >
+        </activity>
     </application>
 
 </manifest>

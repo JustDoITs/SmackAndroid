@@ -16,5 +16,6 @@
     <string name="send">发送</string>
     <string name="title_activity_chat">ChatActivity</string>
     <string name="title_activity_pub_view">PubViewActivity</string>
+    <string name="title_activity_view_sub_msg">ViewSubMsgActivity</string>
 
 </resources>
