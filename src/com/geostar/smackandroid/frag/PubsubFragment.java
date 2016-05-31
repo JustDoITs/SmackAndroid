@@ -145,28 +145,49 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		if(pubSubMgr == null) return;
 		LeafNode leaf = null;
 		try {
-			leaf = pubSubMgr.createNode(nodeName);
+			leaf = pubSubMgr.getNode(nodeName);
 		} catch (NoResponseException | XMPPErrorException
-				| NotConnectedException e1) {
+				| NotConnectedException e2) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e2.printStackTrace();
 		}
-		if(leaf == null) return;
+		if(leaf!= null){
+			Toast.makeText(getContext(), "节点已经存在了！！！", 5).show();
+			return;
+		}
+//		try {
+//			leaf = pubSubMgr.createNode(nodeName);
+//		} catch (NoResponseException | XMPPErrorException
+//				| NotConnectedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		if(leaf == null) {
+//			Toast.makeText(getContext(), "节点创建失败！！！", 5).show();
+//			return;
+//		}
+		
 		ConfigureForm form = new ConfigureForm(DataForm.Type.submit);
 		form.setAccessModel(AccessModel.open);
 		form.setDeliverPayloads(false);
 		form.setNotifyRetract(true);
 		form.setPersistentItems(true);
-		form.setMaxItems(9999999);
 		form.setSubscribe(true);
-		form.setPublishModel(PublishModel.open);
 		try {
-			leaf.sendConfigurationForm(form);
+//			leaf.sendConfigurationForm(form);
+			leaf = (LeafNode) pubSubMgr.createNode(nodeName, form);
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Toast.makeText(getContext(), "节点创建异常！！！", 5).show();
 		}
+		if(leaf == null) {
+			Toast.makeText(getContext(), "节点创建失败！！！", 5).show();
+			return;
+		}
+//	}
+	
 //		new SimplePayload("book", "pubsub:test:book", "Two Towers")));
 	}
 
@@ -264,9 +285,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
-
 	
 
 }

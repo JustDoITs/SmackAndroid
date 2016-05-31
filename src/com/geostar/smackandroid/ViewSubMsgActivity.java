@@ -70,6 +70,8 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 	SwipeRefreshLayout mSwipeFresh;
 	
 	private PubSubManager mPubsubManager ;
+	/** 订阅状态，订阅信息  */
+	private Subscription mSubcription;
 	
 	private ServiceConnection mServiceConnection = new ServiceConnection() {
 		
@@ -117,8 +119,8 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 				
 			});
 			try {
-				Subscription subs = node.subscribe(mXmppService.getXMPPConnection().getUser());
-				Log.d(TAG,"-------------------- Subscription:" + subs.toString());
+				mSubcription = node.subscribe(mXmppService.getXMPPConnection().getUser());
+				Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
 //				Subscription	subscribe(String jid, SubscribeForm subForm)
 //				The user subscribes to the node using the supplied jid and subscription options.
 			} catch (NoResponseException | XMPPErrorException
@@ -244,7 +246,7 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 					LeafNode lfn = (LeafNode) node;
 					
 //					mSubMessages = lfn.getItems("hanlyjiang@geo-hanly");
-					Collection<? extends Item> items = lfn.getItems(50);
+					Collection<? extends Item> items = lfn.getItems(mSubcription.getId());
 					mSubMessages.clear();
 					mSubMessages.addAll(items);
 					// 倒序显示，最近的在最上面
@@ -268,25 +270,27 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 		
 	}
 
+	/**
+	 * 发布一条数据到当前节点 
+	 * @param msg
+	 * @param node
+	 */
 	private void sendTestNodeData(String msg,String node) {
 		if(mPubsubManager == null) return;
 		// Create the node
 		try {
 //			LeafNode leaf = mgr.createNode("测试订阅节点");
 			LeafNode leaf = mPubsubManager.getNode(node);
-			ConfigureForm form = new ConfigureForm(DataForm.Type.submit);
-			form.setAccessModel(AccessModel.open);
-			form.setDeliverPayloads(true);
-			form.setNotifyRetract(true);
-			form.setSubscribe(true);
-			form.setPersistentItems(true);
-			form.setPublishModel(PublishModel.open);
-			leaf.sendConfigurationForm(form);
-//			new SimplePayload("book", "pubsub:test:book", "Two Towers")));
-			
-//			leaf.send(new Item(msg));
-			leaf.send(new PayloadItem(msg,
-			new SimplePayload("book", "pubsub:test:book", msg)));
+//			ConfigureForm form = new ConfigureForm(DataForm.Type.submit);
+//			form.setAccessModel(AccessModel.open);
+//			form.setDeliverPayloads(true);
+//			form.setNotifyRetract(true);
+//			form.setSubscribe(true);
+//			form.setPersistentItems(true);
+//			form.setPublishModel(PublishModel.open);
+//			leaf.sendConfigurationForm(form);
+			leaf.send(new PayloadItem(msg ,
+					new SimplePayload("msg", "pubsub:msg:state", "I m ok ")));
 			
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e) {
