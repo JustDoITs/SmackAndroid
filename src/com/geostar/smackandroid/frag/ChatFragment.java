@@ -21,7 +21,7 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		return inflater.inflate(R.layout.messages, null);
+		return inflater.inflate(R.layout.frag_messages, null);
 	}
 
 	@Override

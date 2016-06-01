@@ -74,7 +74,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.pub_sub_layout, null);
+		View v = inflater.inflate(R.layout.frag_pub_sub, null);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		return v;
@@ -259,7 +259,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 			break;
 		case R.id.action_add_test_node:
 			
-			View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.pub_sub_test_input_msg_layout, null);
+			View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 			final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
 			AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
 					,android.R.style.Theme_DeviceDefault_Dialog)
@@ -291,7 +291,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	
 	private void subcribeANode() {
 		// TODO Auto-generated method stub
-		View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.pub_sub_test_input_msg_layout, null);
+		View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 		final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
 		AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
 				,android.R.style.Theme_DeviceDefault_Dialog)

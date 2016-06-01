@@ -55,7 +55,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.contacts, null);
+		View v = inflater.inflate(R.layout.frag_contacts, null);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		return v;
@@ -163,7 +163,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = null;
 			if(convertView == null){
-				convertView = View.inflate(parent.getContext(), R.layout.contact_item, null);
+				convertView = View.inflate(parent.getContext(), R.layout.listitem_contact, null);
 				holder = new ViewHolder(convertView);
 				convertView.setTag(holder);
 			}else{

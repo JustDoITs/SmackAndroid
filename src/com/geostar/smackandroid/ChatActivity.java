@@ -138,7 +138,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 			}
 		}
 		
-		setContentView(R.layout.chat_room_layout);
+		setContentView(R.layout.frag_chat_room);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		
@@ -238,7 +238,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 			
 			ViewHolder holder = null;
 			if(convertView == null){
-				convertView = mInflater.inflate(R.layout.chat_item_all, null);
+				convertView = mInflater.inflate(R.layout.listitem_chat_msg_all_com, null);
 				holder= new ViewHolder(convertView);
 				convertView.setTag(holder);
 			}else{

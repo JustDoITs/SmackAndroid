@@ -125,7 +125,7 @@ public class TestActivity extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			Holder holder = null;
 			if(convertView !=  null){
-				convertView = LayoutInflater.from(TestActivity.this).inflate(R.layout.pubs_discover_all_item, null);
+				convertView = LayoutInflater.from(TestActivity.this).inflate(R.layout.listitem_pubs_sub_item, null);
 				holder = new Holder(convertView);
 				convertView.setTag(holder);
 			}else{

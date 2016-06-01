@@ -179,7 +179,7 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			View diaView = LayoutInflater.from(this).inflate(R.layout.pub_sub_test_input_msg_layout, null);
+			View diaView = LayoutInflater.from(this).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 			final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
 			AlertDialog dialog = new AlertDialog.Builder(this,android.R.style.Theme_DeviceDefault_Dialog)
 					.setTitle("输入发布的消息的内容")

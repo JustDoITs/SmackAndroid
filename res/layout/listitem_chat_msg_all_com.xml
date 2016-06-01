@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-    <include layout="@layout/chat_item_mine"/>
-    <include layout="@layout/chat_item_others"/>
+    <include layout="@layout/listitem_chat_msg_mine"/>
+    <include layout="@layout/listitem_chat_msg_others"/>
 
 </FrameLayout>
