@@ -5,7 +5,6 @@
     android:orientation="vertical" >
     
     <include layout="@layout/chat_item_mine"/>
-    "
     <include layout="@layout/chat_item_others"/>
 
 </FrameLayout>
