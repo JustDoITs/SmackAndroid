@@ -19,10 +19,9 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.geostar.smackandroid.frag.BaseFragment;
-import com.geostar.smackandroid.frag.ChatFragment;
-import com.geostar.smackandroid.frag.ContactFragment;
-import com.geostar.smackandroid.frag.PubsubFragment;
+import com.geostar.smackandroid.chat.ChatFragment;
+import com.geostar.smackandroid.contacts.ContactFragment;
+import com.geostar.smackandroid.pubsub.PubsubFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 import com.geostar.smackandroid.utils.Utils;

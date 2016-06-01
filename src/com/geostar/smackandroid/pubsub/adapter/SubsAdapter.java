@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.adapter;
+package com.geostar.smackandroid.pubsub.adapter;
 
 import java.util.List;
 

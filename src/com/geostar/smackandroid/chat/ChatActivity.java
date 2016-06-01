@@ -1,4 +1,4 @@
-package com.geostar.smackandroid;
+package com.geostar.smackandroid.chat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.R.id;
+import com.geostar.smackandroid.R.layout;
+import com.geostar.smackandroid.R.menu;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 

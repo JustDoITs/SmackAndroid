@@ -1,4 +1,4 @@
-package com.geostar.smackandroid;
+package com.geostar.smackandroid.pubsub;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,8 +40,12 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.geostar.smackandroid.adapter.SubMessageAdapter;
-import com.geostar.smackandroid.adapter.SubMessageAdapter.ContentProv;
+import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.R.id;
+import com.geostar.smackandroid.R.layout;
+import com.geostar.smackandroid.R.menu;
+import com.geostar.smackandroid.pubsub.adapter.SubMessageAdapter;
+import com.geostar.smackandroid.pubsub.adapter.SubMessageAdapter.ContentProv;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 

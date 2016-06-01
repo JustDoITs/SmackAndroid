@@ -33,8 +33,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 
-import com.geostar.smackandroid.ChatActivity;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.chat.ChatActivity;
 import com.geostar.smackandroid.utils.Utils;
 /**
  * 默认的服务器设置（IP 端口 服务名）配置在string.xml 中

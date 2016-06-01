@@ -1,11 +1,10 @@
-package com.geostar.smackandroid.frag;
+package com.geostar.smackandroid;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.app.ListFragment;
 
-import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 

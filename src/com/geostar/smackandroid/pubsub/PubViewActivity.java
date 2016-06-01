@@ -1,4 +1,9 @@
-package com.geostar.smackandroid;
+package com.geostar.smackandroid.pubsub;
+
+import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.R.id;
+import com.geostar.smackandroid.R.layout;
+import com.geostar.smackandroid.R.menu;
 
 import android.app.ListActivity;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.frag;
+package com.geostar.smackandroid.contacts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,9 +25,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.geostar.smackandroid.ChatActivity;
+import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.chat.ChatActivity;
 
 public class ContactFragment extends BaseFragment implements RosterListener,PresenceListener,OnRefreshListener{
 	

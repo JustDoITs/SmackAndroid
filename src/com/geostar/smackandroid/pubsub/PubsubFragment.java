@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.frag;
+package com.geostar.smackandroid.pubsub;
 
 import java.util.List;
 
@@ -42,11 +42,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.ViewSubMsgActivity;
-import com.geostar.smackandroid.adapter.SubsAdapter;
-import com.geostar.smackandroid.adapter.SubsAdapter.ContentProv;
+import com.geostar.smackandroid.pubsub.adapter.SubsAdapter;
+import com.geostar.smackandroid.pubsub.adapter.SubsAdapter.ContentProv;
 
 /**
  * 订阅子页面

@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.frag;
+package com.geostar.smackandroid.chat;
 
 import android.content.ComponentName;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 
