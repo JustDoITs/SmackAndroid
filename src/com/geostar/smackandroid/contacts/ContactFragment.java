@@ -11,10 +11,8 @@ import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -65,9 +63,9 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	}
 
 	@Override
-	public void onServiceConnected(ComponentName name, IBinder service) {
+	public void onServiceConnected(AbstractXMPPConnection conn) {
 //		getXMPPService() = ((XMPPBinder)service).getService();
-		super.onServiceConnected(name, service);
+		super.onServiceConnected(conn);
 		mRoster = Roster.getInstanceFor(getXMPPConnection());
 		mRoster.addRosterListener(this);
 		
@@ -87,10 +85,6 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		}
 	}
 
-	@Override
-	public void onServiceDisconnected(ComponentName name) {
-		super.onServiceDisconnected(name);
-	}
 
 	@Override
 	public void onResume() {

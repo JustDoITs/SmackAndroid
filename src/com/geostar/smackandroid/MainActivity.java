@@ -49,16 +49,16 @@ public class MainActivity extends FragmentActivity {
 		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
-				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceDisconnected(name);
-			}
+//			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
+//				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceDisconnected(name);
+//			}
 		}
 		
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
 			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
-				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(name, service);
+				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
 			}
 		}
 	};

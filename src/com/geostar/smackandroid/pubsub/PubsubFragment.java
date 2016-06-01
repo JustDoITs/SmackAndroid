@@ -19,11 +19,9 @@ import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 import org.jivesoftware.smackx.xdata.packet.DataForm;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -110,14 +108,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		
 	}
 
-
-	@Override
-	public void onServiceConnected(ComponentName name, IBinder service) {
-		super.onServiceConnected(name, service);
-		// 加载可用订阅列表
-//		loadAllPubs();
-	}
-
 	
 	@Override
 	public void onResume() {
@@ -190,12 +180,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 	}
 
-
-	@Override
-	public void onServiceDisconnected(ComponentName name) {
-		super.onServiceDisconnected(name);
-		
-	}
 
 	@Override
 	public void onRefresh() {
