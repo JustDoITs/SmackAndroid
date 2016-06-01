@@ -2,6 +2,8 @@ package com.geostar.smackandroid;
 
 import java.util.Locale;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -18,19 +20,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.geostar.smackandroid.frag.BaseFragment;
-import com.geostar.smackandroid.frag.ContactFragment;
 import com.geostar.smackandroid.frag.ChatFragment;
+import com.geostar.smackandroid.frag.ContactFragment;
 import com.geostar.smackandroid.frag.PubsubFragment;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.utils.Utils;
 
+/**
+ * 登录之后进入
+ * @author jianghanghang
+ *
+ */
 public class MainActivity extends FragmentActivity {
+
+	private static final String TAG = "MainActivity";
 
 	private SectionsPagerAdapter mSectionsPagerAdapter;
 
 	private ViewPager mViewPager;
 	
 	private XMPPService mXmppService;
+	
+	private int mCurrentPage = -1;
 	
 	private ServiceConnection mServiceConnection = new ServiceConnection() {
 		
@@ -53,23 +65,78 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Utils.logDebug(TAG, "OnCreate" + " savedInstanceState " + savedInstanceState);
 		setContentView(R.layout.activity_after_login);
+		if(savedInstanceState != null){
+			mCurrentPage = savedInstanceState.getInt("page");
+		}
 		
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(0));
+		getActionBar().setTitle(getResources().getString(R.string.app_name));
+		initActionBar();
 		mViewPager
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
-						getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(position));
+						mCurrentPage = position;
+//						getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(position));
+						getActionBar().selectTab(getActionBar().getTabAt(position));
 					}
 				});
-		
+		mViewPager.setCurrentItem(mCurrentPage);
 		Intent intent = new Intent(this,XMPPService.class);
 		bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle arg0) {
+		Utils.logDebug(TAG, "onSaveInstanceState");
+		// TODO Auto-generated method stub
+		arg0.putInt("page", mCurrentPage);
+		super.onSaveInstanceState(arg0);
+	}
+	
+	private void initActionBar() {
+		// TODO Auto-generated method stub
+		final ActionBar actionBar = getActionBar();
+
+		// Specify that tabs should be displayed in the action bar.
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		// Create a tab listener that is called when the user changes tabs.
+		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+
+			@Override
+			public void onTabSelected(Tab tab,
+					android.app.FragmentTransaction fragmenttransaction) {
+				// TODO Auto-generated method stub
+				mViewPager.setCurrentItem(tab.getPosition());
+
+			}
+
+			@Override
+			public void onTabUnselected(Tab tab,
+					android.app.FragmentTransaction fragmenttransaction) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onTabReselected(Tab tab,
+					android.app.FragmentTransaction fragmenttransaction) {
+				// TODO Auto-generated method stub
+
+			}
+		};
+
+		// Add 3 tabs, specifying the tab's text and TabListener
+		for (int i = 0; i < 3; i++) {
+			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i).toString())
+					.setTabListener(tabListener));
+		}
 	}
 
 	/**
@@ -133,15 +200,19 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
+		Utils.logDebug(TAG, "onResume");
 		if(mXmppService != null && !mXmppService.getXMPPConnection().isConnected()) {
 			mXmppService.reconnect();
+		}
+		if(mCurrentPage != -1){
+			mViewPager.setCurrentItem(mCurrentPage,true);
 		}
 		super.onResume();
 	}
 	
 	@Override
 	protected void onDestroy() {
+		Utils.logDebug(TAG, "onDestroy");
 		if(mServiceConnection !=null){
 			unbindService(mServiceConnection);
 			mServiceConnection =null;

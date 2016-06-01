@@ -1,4 +1,6 @@
-package com.geostar.smackandroid;
+package com.geostar.smackandroid.utils;
+
+import com.geostar.smackandroid.BuildConfig;
 
 import android.util.Log;
 

@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -138,6 +139,8 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 		}
 		setContentView(R.layout.activity_view_sub_msg);
 		getActionBar().setTitle(mNodeName);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		mSwipeFresh = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
 		mSwipeFresh.setOnRefreshListener(this);
 		
@@ -178,6 +181,10 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
+		if(id == android.R.id.home){
+				NavUtils.navigateUpFromSameTask(this);
+				return true;
+		}
 		if (id == R.id.action_settings) {
 			View diaView = LayoutInflater.from(this).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 			final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);

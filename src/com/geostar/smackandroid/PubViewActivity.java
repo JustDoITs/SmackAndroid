@@ -2,6 +2,7 @@ package com.geostar.smackandroid;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,7 +17,7 @@ public class PubViewActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pub_view);
-		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -32,6 +33,10 @@ public class PubViewActivity extends ListActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
+		if(id == android.R.id.home){
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		}
 		if (id == R.id.action_settings) {
 			return true;
 		}

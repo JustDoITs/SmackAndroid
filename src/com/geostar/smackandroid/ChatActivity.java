@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -139,6 +140,8 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		}
 		
 		setContentView(R.layout.frag_chat_room);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		
@@ -289,6 +292,10 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			return true;
+		}
+		if(id == android.R.id.home){
+			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
