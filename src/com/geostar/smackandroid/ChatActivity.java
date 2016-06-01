@@ -58,6 +58,8 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	private Button mMsgSendBtn;
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	/** 进入时消息 */
+	private String firstInMsg;
 	
 	private  XMPPService getXmppService(){
 		return mXmppService;
@@ -94,18 +96,17 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 					});
                 }
             }
-
-
         };
         mXmppService.getXMPPConnection().addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
 	}
 	
 
-
-	
 	/** 刷新List */
 	protected void initListView() {
 		mAdapter = new ChatAdapter(this, mMsgLists);
+		if(firstInMsg != null){
+			mMsgLists.add(new Message("me", firstInMsg));
+		}
 		getListView().setAdapter(mAdapter);
 	}
 	
@@ -122,12 +123,16 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		String inMsg = null;
 		if(mChatOjb == null){
 			Intent args = getIntent();
 			if(args == null){
 				finish();
 			}
+			
 			mChatOjb = args.getStringExtra("user");
+			firstInMsg = args.getStringExtra("msg");
+			
 			if(TextUtils.isEmpty(mChatOjb)){
 				finish();
 			}
@@ -155,9 +160,6 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		
 	}
 
-
-
-	
 
 	/** 
 	 * 发送消息
@@ -196,9 +198,12 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		
 	}
 
-
-
-
+	/**
+	 * 聊天消息列表Adapter
+	 * 直接使用Smack 的 Message 对象为其数据item
+	 * @author jianghanghang
+	 *
+	 */
 	class ChatAdapter extends BaseAdapter{
 		
 		private static final int MAX_MSG_SIZE = 100;
@@ -206,7 +211,6 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 		private List<Message> mMsgDatas;
 		
 		private LayoutInflater mInflater;
-		
 		
 		public ChatAdapter(Context context,List<Message> mMsgDatas) {
 			super();
@@ -241,7 +245,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 				holder = (ViewHolder) convertView.getTag();
 			}
 			Message msg = getItem(position);
-			if(msg.getTo().contains(mChatOjb)){
+			if(msg.getTo().contains(mChatOjb)){// 自己发出的消息
 				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.VISIBLE);
 				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.GONE);
 				holder.msgMine.setText(msg.getBody());

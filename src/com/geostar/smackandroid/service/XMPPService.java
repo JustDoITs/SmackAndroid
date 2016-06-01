@@ -11,28 +11,41 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
-import android.util.Log;
 
+import com.geostar.smackandroid.ChatActivity;
 import com.geostar.smackandroid.R;
-
+import com.geostar.smackandroid.Utils;
+/**
+ * 默认的服务器设置（IP 端口 服务名）配置在string.xml 中
+ * @author jianghanghang
+ *
+ */
 public class XMPPService extends Service {
 
 	private static final String TAG = "XMPPService";
 	
-	ExecutorService mExecService = Executors.newFixedThreadPool(2);
+	private ExecutorService mExecService = Executors.newFixedThreadPool(2);
 	
     private AbstractXMPPConnection mXmppConnection;
     private String mUsername,mPassword;
@@ -42,25 +55,25 @@ public class XMPPService extends Service {
     private List<String> mChatThreads = new ArrayList<String>();
     
     private List<Chat> mAllChats = new ArrayList<Chat>();
-
+    
+    private static final int DEFAULT_NOTI_ID = 0x90;
+    
     @Override
     public void onCreate() {
-    	// TODO Auto-generated method stub
-    	Log.d(TAG,"usrName:" + mUsername);
+    	Utils.logDebug(TAG,"usrName:" + mUsername);
     	super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
     	
-    	Log.d(TAG,"usrName:" + mUsername);
+    	Utils.logDebug(TAG,"usrName:" + mUsername);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        Log.d(TAG,"Onbind");
+        Utils.logDebug(TAG,"Onbind");
         return mBinder;
     }
 
@@ -90,40 +103,64 @@ public class XMPPService extends Service {
 
         mXmppConnection = new XMPPTCPConnection(config);
         mXmppConnection.connect();
-
-        // ������������Ϣ����
         registerPacketListener();
     }
 
+    /** 注册消息监听  */
     private void registerPacketListener() {
-    	// StanzaListener Ϊ�첽�ģ�����PacketCollector Ϊͬ���� 
+//    	 StanzaListener PacketCollector
+    	// 联系人状态改变监听 
 //        StanzaListener presenceTypelistener = new StanzaListener() {
 //            @Override
 //            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
 //                sendMsgNotification();
-//                Log.d(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
+//                Utils.logDebug(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
 //            }
 //        };
-//        StanzaListener Messagelistener = new StanzaListener() {
-//            @Override
-//            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
-//                sendMsgNotification();
-//                if(packet instanceof org.jivesoftware.smack.packet.Message){
-//                    org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
-//                    Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
-//                }
-//            }
-//        };
-////        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
-//       //  MessageWithBodiesFilter.INSTANCE��ForEveryMessage.INSTANCE Ϊ��ͬ����Ϣ������
-//        mXmppConnection.addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
 //        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.AVAILABLE);
-        
+//        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.PROBE);
+        StanzaListener messagelistener = new StanzaListener() {
+            @Override
+            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
+                if(packet instanceof org.jivesoftware.smack.packet.Message){
+                    org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
+                    Utils.logDebug(TAG,"接收到一条消息: " +  msg.getBody());
+                    sendMsgNotification(msg);
+                }
+            }
+        };
+//        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
+       //  MessageWithBodiesFilter.INSTANCE��ForEveryMessage.INSTANCE 
+        mXmppConnection.addAsyncStanzaListener(messagelistener, MessageWithBodiesFilter.INSTANCE);
     }
 
-    private void sendMsgNotification() {
-
+    /**发送通知栏通知  */
+    private void sendMsgNotification(org.jivesoftware.smack.packet.Message msg) {
+    	NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+    	        .setSmallIcon(R.drawable.ic_launcher)
+    	        .setContentTitle(msg.getFrom().split("@")[0])// 设置标题为联系人
+    	        .setContentText( msg.getBody())
+    	        .setAutoCancel(true); // 设置通知内容为消息内容
+    	// Creates an explicit intent for an Activity in your app
+    	Intent resultIntent = new Intent(this, ChatActivity.class);
+    	// 仅放置最新一条消息
+    	resultIntent.putExtra("user", msg.getFrom());
+    	resultIntent.putExtra("msg", msg.getBody());
+    	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+    	// Adds the back stack for the Intent (but not the Intent itself)
+    	stackBuilder.addParentStack(ChatActivity.class);
+    	// Adds the Intent that starts the Activity to the top of the stack
+    	stackBuilder.addNextIntent(resultIntent);
+    	PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+    				0, PendingIntent.FLAG_UPDATE_CURRENT );
+    	mBuilder.setContentIntent(resultPendingIntent);
+    	NotificationManager mNotificationManager =
+    	    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    	// mId allows you to update the notification later on.
+    	mNotificationManager.notify(DEFAULT_NOTI_ID, mBuilder.build());
     }
+    
+
 
     public AbstractXMPPConnection getXMPPConnection() {
         return mXmppConnection;
@@ -231,6 +268,12 @@ public class XMPPService extends Service {
             }
         });
 
+    }
+    
+    public void logout(){
+    	if(mXmppConnection != null && mXmppConnection.isConnected()){
+    		mXmppConnection.disconnect();
+    	}
     }
 
     private ChatMessageListener mDefaultMsgListener = new ChatMessageListener() {

@@ -32,10 +32,6 @@ public class MainActivity extends FragmentActivity {
 	
 	private XMPPService mXmppService;
 	
-	private  XMPPService getXmppService(){
-		return mXmppService;
-	}
-	
 	private ServiceConnection mServiceConnection = new ServiceConnection() {
 		
 		@Override
@@ -116,7 +112,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 	
-	public Fragment createFragmentItem(int position) {
+	private Fragment createFragmentItem(int position) {
 		BaseFragment frag = null;
 		switch (position) {
 		case 0:
@@ -134,24 +130,6 @@ public class MainActivity extends FragmentActivity {
 		return frag;
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.after_login, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	@Override
 	protected void onResume() {
@@ -169,6 +147,54 @@ public class MainActivity extends FragmentActivity {
 			mServiceConnection =null;
 		}
 		super.onDestroy();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.after_login, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		switch (mViewPager.getCurrentItem()) {
+		case 0:
+		case 1:
+			menu.findItem(R.id.action_switch_account).setVisible(true);
+			menu.findItem(R.id.action_exit).setVisible(true);
+			break;
+		case 2:
+			menu.findItem(R.id.action_switch_account).setVisible(false);
+			menu.findItem(R.id.action_exit).setVisible(false);
+			break;
+		default:
+			break;
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_switch_account) {
+			mXmppService.logout();
+			startActivity(new Intent(this,LoginActivity.class));
+			finish();
+			return true;
+		}
+		if (id == R.id.action_exit) {
+			mXmppService.logout();
+			finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 }

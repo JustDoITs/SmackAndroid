@@ -61,6 +61,11 @@ public class LoginActivity extends Activity {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "onServiceConnected");
 			mXmppService = ((XMPPBinder)service).getService();
+			if(mXmppService.getXMPPConnection() != null && mXmppService.getXMPPConnection().isConnected()){
+				Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+				startActivity(intent);
+				finish();
+			}
 		}
 
 		@Override

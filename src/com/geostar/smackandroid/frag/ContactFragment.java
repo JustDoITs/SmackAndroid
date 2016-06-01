@@ -39,7 +39,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	
 	
 	public interface OnContactClick{
-		void OnContactClick(RosterEntry contact);
+		void onContactClick(RosterEntry contact);
 	}
 
 	public ContactFragment(MainActivity activity) {
@@ -84,7 +84,9 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 			mRostersData.addAll(mRoster.getEntries());
 
 			mAdapter = new ContactAdapter(mRostersData);
-			getListView().setAdapter(mAdapter);
+			if( getView() != null){
+				getListView().setAdapter(mAdapter);
+			}
 		}
 	}
 

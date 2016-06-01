@@ -19,12 +19,13 @@
         android:id="@+id/et_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="密码" />
+        android:hint="密码" 
+        android:password="true"/>
 
     <Button
         android:id="@+id/btn_submit_or_reg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content" 
         android:hint="登录或注册" />
 
 </LinearLayout>

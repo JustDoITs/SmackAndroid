@@ -20,6 +20,10 @@ public abstract class BaseFragment extends ListFragment implements ServiceConnec
 	}
 
 
+	/**
+	 * 默认获取并设置 XMPPService 
+	 * @see android.content.ServiceConnection#onServiceConnected(android.content.ComponentName, android.os.IBinder)
+	 */
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
 		mService = ((XMPPBinder)service).getService();
