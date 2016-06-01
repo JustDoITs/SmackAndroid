@@ -214,35 +214,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	}
 	
 	
-	
-	
-	
-	/**
-	 * 发送测试消息
-	 */
-	private void sendTestPubMsg() {
-		// TODO Auto-generated method stub
-		if(!checkConnection()){
-			return ;
-		}
-
-		if(pubSubMgr == null){
-			pubSubMgr = new PubSubManager(getXMPPService().getXMPPConnection());
-		}
-		LeafNode node = null;
-		try {
-			node = pubSubMgr.getNode("testNode");
-			// Publish an Item, let service set the id
-			node.send(new Item());
-			// Publish an Item with the specified id
-			node.send(new Item("123abc"));
-		} catch (NoResponseException | XMPPErrorException
-				| NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// TODO Auto-generated method stub
@@ -290,7 +261,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	
 	
 	private void subcribeANode() {
-		// TODO Auto-generated method stub
 		View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 		final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
 		AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
@@ -315,7 +285,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	}
 
 	protected void doSubcribleANode(String nodeName) {
-		// TODO Auto-generated method stub
 		if(pubSubMgr == null) return;
 		
 		Node node = null;
