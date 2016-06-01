@@ -1,21 +1,21 @@
 package com.geostar.smackandroid;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
+
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.app.ListFragment;
 
-import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 
 public abstract class BaseFragment extends ListFragment implements ServiceConnection {
 
-	private MainActivity mActivity;
-	private XMPPService mService;
+	private AbstractXMPPConnection mXmppConnection;
 	
 	
-	public BaseFragment(MainActivity activity) {
-		mActivity = activity;
+	public BaseFragment(AbstractXMPPConnection conn ) {
+		mXmppConnection = conn;
 	}
 
 
@@ -25,7 +25,7 @@ public abstract class BaseFragment extends ListFragment implements ServiceConnec
 	 */
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
-		mService = ((XMPPBinder)service).getService();
+		mXmppConnection = ((XMPPBinder)service).getService().getXMPPConnection();
 	}
 
 
@@ -35,14 +35,12 @@ public abstract class BaseFragment extends ListFragment implements ServiceConnec
 		
 	}
 	
-	public XMPPService getXMPPService(){
-		return mService;
+	public AbstractXMPPConnection getXMPPConnection(){
+		return mXmppConnection;
 	}
 	
-	
 	public boolean checkConnection(){
-		if(mService != null && mService.getXMPPConnection() != null
-//				&& mService.getXMPPConnection().isConnected()
+		if(mXmppConnection != null && mXmppConnection.isConnected()
 				){
 			return true;
 		}

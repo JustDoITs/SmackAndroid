@@ -2,6 +2,8 @@ package com.geostar.smackandroid;
 
 import java.util.Locale;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Service;
@@ -180,15 +182,16 @@ public class MainActivity extends FragmentActivity {
 	
 	private Fragment createFragmentItem(int position) {
 		BaseFragment frag = null;
+		AbstractXMPPConnection conn = mXmppService==null?null:mXmppService.getXMPPConnection();
 		switch (position) {
 		case 0:
-			frag = new ContactFragment(this);
+			frag = new ContactFragment(conn);
 			break;
 		case 1:
-			frag = new ChatFragment(this);
+			frag = new ChatFragment(conn);
 			break;
 		case 2:
-			frag = new PubsubFragment(this);
+			frag = new PubsubFragment(conn);
 			break;
 		default:
 			break;

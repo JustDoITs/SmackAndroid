@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.PresenceListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
@@ -26,7 +27,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.geostar.smackandroid.BaseFragment;
-import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.chat.ChatActivity;
 
@@ -38,15 +38,11 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	private List<RosterEntry> mRostersData = new ArrayList<RosterEntry>();
 	private ContactAdapter mAdapter;
 	
+	public ContactFragment(AbstractXMPPConnection conn) {
+		super(conn);
+	}
 	
-	public interface OnContactClick{
-		void onContactClick(RosterEntry contact);
-	}
-
-	public ContactFragment(MainActivity activity) {
-		super(activity);
-	}
-
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -72,7 +68,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 	public void onServiceConnected(ComponentName name, IBinder service) {
 //		getXMPPService() = ((XMPPBinder)service).getService();
 		super.onServiceConnected(name, service);
-		mRoster = Roster.getInstanceFor(getXMPPService().getXMPPConnection());
+		mRoster = Roster.getInstanceFor(getXMPPConnection());
 		mRoster.addRosterListener(this);
 		
 		loadContactListToView();
@@ -80,7 +76,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 
 
 	private void loadContactListToView() {
-		if(getXMPPService() != null && getXMPPService().getXMPPConnection() != null ){
+		if(getXMPPConnection() != null ){
 			mRostersData = new ArrayList<RosterEntry>();
 			mRostersData.addAll(mRoster.getEntries());
 
@@ -172,7 +168,7 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 			}
 			
 			RosterEntry entry = getItem(position);
-			holder.user.setText(entry.getUser());
+			holder.user.setText(entry.getUser().split("@")[0]);
 			
 			Presence pre = ContactFragment.this.mRoster.getPresence(entry.getUser());
 			String nickname = TextUtils.isEmpty(entry.getName())?"":("("+ entry.getName()+")" );
@@ -206,6 +202,12 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
 	
+	private void goToChatActivity(RosterEntry touser) {
+		Intent intent = new Intent(getActivity(),ChatActivity.class);
+		intent.putExtra("user",touser.getUser() );
+		startActivity(intent);
+	}
+
 	private OnItemClickListener mOnContactClick = new OnItemClickListener(){
 
 		@Override
@@ -215,11 +217,8 @@ public class ContactFragment extends BaseFragment implements RosterListener,Pres
 			if(touser == null){
 				return ;
 			}
-			Intent intent = new Intent(getActivity(),ChatActivity.class);
-			intent.putExtra("user",touser.getUser() );
-			startActivity(intent);
+			goToChatActivity(touser);
 		}
-		
 	};
 
 }

@@ -2,6 +2,7 @@ package com.geostar.smackandroid.pubsub;
 
 import java.util.List;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
@@ -43,7 +44,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.geostar.smackandroid.BaseFragment;
-import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.pubsub.adapter.SubsAdapter;
 import com.geostar.smackandroid.pubsub.adapter.SubsAdapter.ContentProv;
@@ -56,6 +56,7 @@ import com.geostar.smackandroid.pubsub.adapter.SubsAdapter.ContentProv;
  */
 public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 
+
 	private static final String TAG = "PubsubFragment";
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -66,11 +67,11 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 
 	private Subscription mSubcription;
 
-	
-	public PubsubFragment(MainActivity activity) {
-		super(activity);
+	public PubsubFragment(AbstractXMPPConnection conn) {
+		super(conn);
+		// TODO Auto-generated constructor stub
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -91,13 +92,10 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position,
 					long id) {
-				// TODO Auto-generated method stub
 				Affiliation affiliation = (Affiliation) parent.getAdapter().getItem(position);
 				// 获取订阅节点
 				String pubNode = affiliation.getNodeId();
-				Intent intent = new Intent(PubsubFragment.this.getActivity(),ViewSubMsgActivity.class);
-				intent.putExtra("node", pubNode);
-				startActivity(intent);
+				goViewPubMessage(pubNode);
 			}
 		});
 		
@@ -118,7 +116,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		super.onServiceConnected(name, service);
 		// 加载可用订阅列表
 //		loadAllPubs();
-		
 	}
 
 	
@@ -133,7 +130,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 			return;
 		}
 		if(pubSubMgr == null){
-			pubSubMgr = new PubSubManager(getXMPPService().getXMPPConnection());
+			pubSubMgr = new PubSubManager(getXMPPConnection());
 		}
 		// 获取订阅关系
 		mPubs = pubSubMgr.getAffiliations();
@@ -305,7 +302,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 		if(allRels == null) return;
 		
-		String curJid = getXMPPService().getXMPPConnection().getUser();
+		String curJid = getXMPPConnection().getUser();
 		boolean isSubcribled = false;
 		for(Subscription s : allRels){
 			if(curJid.contains(s.getJid())){
@@ -334,7 +331,7 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 		
 		try {
-			mSubcription = node.subscribe(getXMPPService().getXMPPConnection().getUser());
+			mSubcription = node.subscribe(getXMPPConnection().getUser());
 			Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
 //			Subscription	subscribe(String jid, SubscribeForm subForm)
 //			The user subscribes to the node using the supplied jid and subscription options.
@@ -386,5 +383,11 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		}
 		// refresh
 		onRefresh();
+	}
+
+	private void goViewPubMessage(String pubNode) {
+		Intent intent = new Intent(PubsubFragment.this.getActivity(),ViewSubMsgActivity.class);
+		intent.putExtra("node", pubNode);
+		startActivity(intent);
 	}
 }

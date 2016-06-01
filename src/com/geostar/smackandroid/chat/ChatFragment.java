@@ -1,5 +1,7 @@
 package com.geostar.smackandroid.chat;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
+
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -9,13 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.geostar.smackandroid.BaseFragment;
-import com.geostar.smackandroid.MainActivity;
 import com.geostar.smackandroid.R;
 
 public class ChatFragment extends BaseFragment implements OnRefreshListener {
 
-	public ChatFragment(MainActivity activity) {
-		super(activity);
+
+	public ChatFragment(AbstractXMPPConnection conn) {
+		super(conn);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -44,6 +47,5 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
 
 }

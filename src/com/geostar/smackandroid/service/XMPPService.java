@@ -108,17 +108,6 @@ public class XMPPService extends Service {
 
     /** 注册消息监听  */
     private void registerPacketListener() {
-//    	 StanzaListener PacketCollector
-    	// 联系人状态改变监听 
-//        StanzaListener presenceTypelistener = new StanzaListener() {
-//            @Override
-//            public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
-//                sendMsgNotification();
-//                Utils.logDebug(TAG,"Recv a message PresenceTypeFilter.AVAILABLE - getStanzaId : " +  packet.getStanzaId());
-//            }
-//        };
-//        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.AVAILABLE);
-//        mXmppConnection.addAsyncStanzaListener(presenceTypelistener, PresenceTypeFilter.PROBE);
         StanzaListener messagelistener = new StanzaListener() {
             @Override
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
