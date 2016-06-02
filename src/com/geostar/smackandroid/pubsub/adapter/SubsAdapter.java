@@ -1,6 +1,10 @@
 package com.geostar.smackandroid.pubsub.adapter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.jivesoftware.smackx.pubsub.Affiliation;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,15 +17,15 @@ import android.widget.TextView;
 
 import com.geostar.smackandroid.R;
 
-public class SubsAdapter<T> extends BaseAdapter {
+public class SubsAdapter extends BaseAdapter {
 
-	private List<T> mDatas;
+	private List<Affiliation> mDatas;
 	private Context mContext;
-	
-	public SubsAdapter(Context context,List<T> mDatas, ContentProv<T> mContentGetter) {
+	private Map<String,Integer> hasNewMessageNode = new HashMap<String,Integer>();
+ 	
+	public SubsAdapter(Context context,List<Affiliation> mDatas) {
 		super();
 		this.mDatas = mDatas;
-		this.mContentGetter = mContentGetter;
 		mContext = context;
 	}
 
@@ -29,12 +33,7 @@ public class SubsAdapter<T> extends BaseAdapter {
 		String getText1(T obj);
 		String getText2(T obj);
 		OnClickListener getBtnClick(T obj);
-	}
-	
-	private ContentProv<T> mContentGetter = null;
-	
-	public void setContentGetter(ContentProv<T> getter){
-		mContentGetter = getter;
+		void setHasNewMessage(Button msgIndicator, T obj);
 	}
 	
 	@Override
@@ -43,7 +42,7 @@ public class SubsAdapter<T> extends BaseAdapter {
 	}
 
 	@Override
-	public T getItem(int position) {
+	public Affiliation getItem(int position) {
 		return mDatas.get(position);
 	}
 
@@ -56,30 +55,44 @@ public class SubsAdapter<T> extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Holder holder = null;
 		if(convertView ==  null){
-			convertView = LayoutInflater.from(mContext).inflate(R.layout.listitem_pubs_sub_item, null);
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.listitem_pubs_node_item, null);
 			holder = new Holder(convertView);
 			convertView.setTag(holder);
 		}else{
 			holder = (Holder) convertView.getTag();
 		}
-		if( mContentGetter != null ){
-			T item = getItem(position);
-			holder.title.setText(mContentGetter.getText1(item));
-			holder.desc.setText(mContentGetter.getText2(item));
-			holder.addSubs.setOnClickListener(mContentGetter.getBtnClick(item));
+		Affiliation item = getItem(position);
+		holder.title.setText(item.getNodeId());
+		holder.desc.setText(item.getType().toString());
+		holder.addSubs.setVisibility(View.GONE);
+		if(hasNewMessageNode.keySet().contains(item.getNodeId())){
+			holder.redDot.setText(hasNewMessageNode.get(item.getNodeId())  + "");
+			holder.redDot.setVisibility(View.VISIBLE);
+		}else{
+			holder.redDot.setVisibility(View.GONE);
 		}
 		return convertView;
 	}
 	
 	
+	public void addNewMessageFlag(String nodeId,int num){
+		hasNewMessageNode.put(nodeId, num);
+	}
+	
+	public void removeNewMessgeFlag(String nodeId){
+		hasNewMessageNode.remove(nodeId);
+	}
+	
 	class Holder {
 		TextView title;
 		TextView desc;
 		Button addSubs;
+		Button redDot;
 		public Holder(View convertView) {
 			this.title = (TextView) convertView.findViewById(R.id.tv_nodename);
 			this.desc = (TextView) convertView.findViewById(R.id.tv_desc);
 			this.addSubs = (Button) convertView.findViewById(R.id.btn_subcrible);
+			this.redDot = (Button) convertView.findViewById(R.id.btn_redot);
 		}
 	}
 

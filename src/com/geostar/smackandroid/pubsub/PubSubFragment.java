@@ -13,7 +13,6 @@ import org.jivesoftware.smackx.pubsub.Item;
 import org.jivesoftware.smackx.pubsub.ItemPublishEvent;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.Node;
-import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 import org.jivesoftware.smackx.xdata.packet.DataForm;
@@ -33,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -43,8 +41,9 @@ import android.widget.Toast;
 
 import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.pubsub.PubSubContract.Presenter;
 import com.geostar.smackandroid.pubsub.adapter.SubsAdapter;
-import com.geostar.smackandroid.pubsub.adapter.SubsAdapter.ContentProv;
+import com.geostar.smackandroid.pubsub.mock.ViewSubMsgActivity;
 
 /**
  * 订阅子页面
@@ -52,22 +51,24 @@ import com.geostar.smackandroid.pubsub.adapter.SubsAdapter.ContentProv;
  * @author jianghanghang
  *
  */
-public class PubsubFragment extends BaseFragment implements OnRefreshListener{
+public class PubSubFragment extends BaseFragment implements PubSubContract.View,OnRefreshListener{
 
 
 	private static final String TAG = "PubsubFragment";
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-	private PubSubManager pubSubMgr;
 	
 	/** 订阅关系数据  */
 	private List<Affiliation> mPubs;
 
 	private Subscription mSubcription;
+	
+	private PubSubContract.Presenter mPresenter;
+	
+	private SubsAdapter mSubsAdapter;
 
-	public PubsubFragment(AbstractXMPPConnection conn) {
+	public PubSubFragment(AbstractXMPPConnection conn) {
 		super(conn);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -93,63 +94,148 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 				Affiliation affiliation = (Affiliation) parent.getAdapter().getItem(position);
 				// 获取订阅节点
 				String pubNode = affiliation.getNodeId();
+				mSubsAdapter.removeNewMessgeFlag(pubNode);
+				mSubsAdapter.notifyDataSetChanged();
 				goViewPubMessage(pubNode);
 			}
 		});
 		
-		try {
-			loadMySubs();
-		} catch (NoResponseException | XMPPErrorException
-				| NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Toast.makeText(getActivity(), "获取订阅列表失败", 5).show();
-		}
-		
+		onRefresh();
 	}
 
+	@Override
+	public void setPresenter(Presenter presenter) {
+		mPresenter = presenter;
+	}
+
+	@Override
+	public void showAllSubscribleNode(List<Affiliation> rels) {
+		// TODO Auto-generated method stub
+		if(rels == null) return;
+		
+		// 获取订阅关系
+		mPubs = rels;
+		mSubsAdapter = new SubsAdapter(getContext(), mPubs);
+
+		getListView().setAdapter(mSubsAdapter);
+	}
+
+	@Override
+	public void showNoSubscribleNode() {
+		Toast.makeText(getContext(), "没有订阅任何节点", 3).show();
+	}
+
+	@Override
+	public void updateSubscribleNode(List<Affiliation> rels) {
+		// TODO Auto-generated method stub
+		showAllSubscribleNode(rels);
+	}
+
+
+	@Override
+	public void handleGetDataException(Exception e) {
+		// TODO 细分处理各种异常，并给出提示
+		Toast.makeText(getContext(), "与服务器通讯异常", 3).show();
+	}
+	
+	
+	@Override
+	public void notifyNewPubMessageFromBackgroud(final String nodeId,final int howMany) {
+		// TODO Auto-generated method stub
+		if(getView() != null){
+			getView().post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					if(mSubsAdapter != null){
+						mSubsAdapter.addNewMessageFlag(nodeId, howMany);
+						mSubsAdapter.notifyDataSetChanged();
+//						getListView().invalidate();
+					}
+				}
+			});
+		}
+	}
+	
 	
 	@Override
 	public void onResume() {
+		if(mPresenter != null){
+			mPresenter.start();
+		}
 		registerForContextMenu(getListView());
 		super.onResume();
 	}
 	
-	private void loadMySubs() throws NoResponseException, XMPPErrorException, NotConnectedException {
-		if(!checkConnection()){
-			return;
+
+	@Override
+	public void onRefresh() {
+		if(mPresenter != null){
+			try {
+				updateSubscribleNode(mPresenter.getAffiliations());
+			} catch (NoResponseException | XMPPErrorException
+					| NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				handleGetDataException(e);
+			}
 		}
-		if(pubSubMgr == null){
-			pubSubMgr = new PubSubManager(getXMPPConnection());
+		mSwipeRefreshLayout.setRefreshing(false);
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.pub_sub_menu, menu);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case R.id.action_add_sub:
+			showSubcribeDialog();
+			break;
+		case R.id.action_add_test_node:
+			showAddNodeDialog();
+			break;
+		default:
+			break;
 		}
-		// 获取订阅关系
-		mPubs = pubSubMgr.getAffiliations();
-		SubsAdapter<Affiliation> adapter = new SubsAdapter<Affiliation>(getContext(), mPubs, new ContentProv<Affiliation>() {
-
-			@Override
-			public String getText1(Affiliation obj) {
-				return obj.getNodeId();
-			}
-
-			@Override
-			public String getText2(Affiliation obj) {
-				return obj.getType().toString();
-			}
-
-			@Override
-			public OnClickListener getBtnClick(Affiliation obj) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		});
-		getListView().setAdapter(adapter);
+		return super.onOptionsItemSelected(item);
 	}
 
-	private void createNode(String nodeName) {
-		if(pubSubMgr == null) return;
+	private void showAddNodeDialog() {
+		View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
+		final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
+		AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
+				,android.R.style.Theme_DeviceDefault_Dialog)
+				.setTitle("创建节点：输入节点名")
+				.setView(diaView)
+				.setPositiveButton("创建", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String nodeName = input.getText().toString();
+						if(!TextUtils.isEmpty(nodeName)){
+							doAddaNode(nodeName);
+						}else{
+							Toast.makeText(PubSubFragment.this.getActivity(), "没有输入内容", 2).show();
+						}
+					}
+				})
+				.setNegativeButton("取消", null)
+				.create();
+		dialog.show();
+	}
+	
+	private void doAddaNode(String nodeName) {
+		if(mPresenter == null) return;
+		
 		LeafNode leaf = null;
 		try {
-			leaf = pubSubMgr.getNode(nodeName);
+			leaf = mPresenter.getPubSubManager().getNode(nodeName);
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e2) {
 			// TODO Auto-generated catch block
@@ -167,7 +253,8 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		form.setPersistentItems(true);
 		form.setSubscribe(true);
 		try {
-			leaf = (LeafNode) pubSubMgr.createNode(nodeName, form);
+			leaf = (LeafNode) mPresenter.getPubSubManager().createNode(nodeName, form);
+			updateSubscribleNode(mPresenter.getAffiliations());
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e) {
 			// TODO Auto-generated catch block
@@ -179,69 +266,8 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 			return;
 		}
 	}
-
-
-	@Override
-	public void onRefresh() {
-//		getListView().postDelayed(null, 1000);
-		try {
-			loadMySubs();
-		} catch (NoResponseException | XMPPErrorException
-				| NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		mSwipeRefreshLayout.setRefreshing(false);
-	}
 	
-	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// TODO Auto-generated method stub
-		inflater.inflate(R.menu.pub_sub_menu, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		switch (item.getItemId()) {
-		case R.id.action_add_sub:
-			subcribeANode();
-			break;
-		case R.id.action_add_test_node:
-			
-			View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
-			final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
-			AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
-					,android.R.style.Theme_DeviceDefault_Dialog)
-					.setTitle("创建节点：输入节点名")
-					.setView(diaView)
-					.setPositiveButton("创建", new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							String nodeName = input.getText().toString();
-							if(!TextUtils.isEmpty(nodeName)){
-								createNode(nodeName);
-							}else{
-								Toast.makeText(PubsubFragment.this.getActivity(), "没有输入内容", 2).show();
-							}
-						}
-					})
-					.setNegativeButton("取消", null)
-					.create();
-			dialog.show();
-			break;
-
-		default:
-			break;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
-	
-	private void subcribeANode() {
+	private void showSubcribeDialog() {
 		View diaView = LayoutInflater.from(this.getActivity()).inflate(R.layout.test_pub_sub_input_msg_layout, null);
 		final EditText input = (EditText) diaView.findViewById(R.id.et_content_input);
 		AlertDialog dialog = new AlertDialog.Builder(this.getActivity()
@@ -254,9 +280,9 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 					public void onClick(DialogInterface dialog, int which) {
 						String nodeName = input.getText().toString();
 						if(!TextUtils.isEmpty(nodeName)){
-							doSubcribleANode(nodeName);
+							doSubcribleNode(nodeName);
 						}else{
-							Toast.makeText(PubsubFragment.this.getActivity(), "没有输入内容", 2).show();
+							Toast.makeText(PubSubFragment.this.getActivity(), "没有输入内容", 2).show();
 						}
 					}
 				})
@@ -265,12 +291,12 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		dialog.show();
 	}
 
-	protected void doSubcribleANode(String nodeName) {
-		if(pubSubMgr == null) return;
+	protected void doSubcribleNode(String nodeName) {
+		if(mPresenter.getPubSubManager() == null) return;
 		
 		Node node = null;
 		try {
-			node = pubSubMgr.getNode(nodeName);
+			node = mPresenter.getPubSubManager().getNode(nodeName);
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e1) {
 			// TODO Auto-generated catch block
@@ -300,17 +326,30 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		node.addItemEventListener(new ItemEventListener <Item>(){
 
 			@Override
-			public void handlePublishedItems(ItemPublishEvent<Item> items) {
+			public void handlePublishedItems(final ItemPublishEvent<Item> items) {
 				// TODO Auto-generated method stub
 				if(items!= null && items.getItems().size() > 0){
 					Log.d(TAG,"-------------------- handlePublishedItems: size=" +
 								items.getItems().size() + "; "+ items.getItems().get(0).toString());
-					Toast.makeText(getActivity(), "收到一条订阅消息：" + items.getItems().get(0).getId(), 3).show();
+					getView().post(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Toast.makeText(getActivity(), "收到一条订阅消息：" + items.getItems().get(0).getId(), 3).show();
+						}
+					});
 				}
 			}
 		});
 		if(isSubcribled) {
-			Toast.makeText(getActivity(), "已订阅，不用重复订阅。", 3).show();
+			getView().post(new Runnable() {
+				
+				@Override
+				public void run() {
+					Toast.makeText(getActivity(), "已订阅，不用重复订阅。", 3).show();
+				}
+			});
 			return;
 		}
 		
@@ -321,8 +360,13 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 //			The user subscribes to the node using the supplied jid and subscription options.
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e) {
-			// TODO Auto-generated catch block
-			Toast.makeText(getActivity(), "订阅失败：" + e.getMessage(), 3).show();
+			getView().post(new Runnable() {
+				
+				@Override
+				public void run() {
+					Toast.makeText(getActivity(), "订阅失败：" + e.getMessage(), 3).show();
+				}
+			});
 			e.printStackTrace();
 		}
 	}
@@ -340,7 +384,6 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 		new MenuInflater(getActivity()).inflate(R.menu.pub_sub_context_menu, menu);
 	}
 
-	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		 AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
@@ -356,9 +399,8 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	}
 
 	private void deleteNode(AdapterContextMenuInfo info) {
-		// TODO Auto-generated method stub
 		try {
-			pubSubMgr.deleteNode(mPubs.get(info.position).getNodeId());
+			mPresenter.getPubSubManager().deleteNode(mPubs.get(info.position).getNodeId());
 		} catch (NoResponseException | XMPPErrorException
 				| NotConnectedException e) {
 			// TODO Auto-generated catch block
@@ -370,8 +412,11 @@ public class PubsubFragment extends BaseFragment implements OnRefreshListener{
 	}
 
 	private void goViewPubMessage(String pubNode) {
-		Intent intent = new Intent(PubsubFragment.this.getActivity(),ViewSubMsgActivity.class);
+		Intent intent = new Intent(PubSubFragment.this.getActivity(),ViewSubMsgActivity.class);
 		intent.putExtra("node", pubNode);
 		startActivity(intent);
 	}
+
+	
+
 }

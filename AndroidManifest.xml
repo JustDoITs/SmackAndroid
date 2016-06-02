@@ -45,7 +45,7 @@
                 android:value="com.geostar.smackandroid.MainActivity" />
         </activity>
         <activity
-            android:name="com.geostar.smackandroid.pubsub.PubViewActivity"
+            android:name="com.geostar.smackandroid.pubsub.mock.PubViewActivity"
             android:label="@string/title_activity_pub_view" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -54,7 +54,7 @@
                 android:value="com.geostar.smackandroid.MainActivity" />
         </activity>
         <activity
-            android:name="com.geostar.smackandroid.pubsub.ViewSubMsgActivity"
+            android:name="com.geostar.smackandroid.pubsub.mock.ViewSubMsgActivity"
             android:label="@string/title_activity_view_sub_msg" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->

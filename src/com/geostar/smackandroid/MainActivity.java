@@ -1,8 +1,11 @@
 package com.geostar.smackandroid;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -12,6 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -20,10 +24,15 @@ import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 
+import com.geostar.smackandroid.base.BasePresenter;
 import com.geostar.smackandroid.chat.ChatFragment;
-import com.geostar.smackandroid.contacts.ContactFragment;
-import com.geostar.smackandroid.pubsub.PubsubFragment;
+import com.geostar.smackandroid.contacts.RosterFragment;
+import com.geostar.smackandroid.contacts.RosterContract;
+import com.geostar.smackandroid.contacts.RosterPresenter;
+import com.geostar.smackandroid.pubsub.PubSubFragment;
+import com.geostar.smackandroid.pubsub.PubSubPresenter;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 import com.geostar.smackandroid.utils.Utils;
@@ -60,6 +69,16 @@ public class MainActivity extends FragmentActivity {
 			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
 				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
 			}
+			RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(0);
+			BasePresenter contactPresenter = new RosterPresenter(
+					mXmppService.getXMPPConnection(), frag);
+			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
+			
+			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(2);
+			BasePresenter pubSubPresenter = new PubSubPresenter(
+					mXmppService.getXMPPConnection(), pf);
+			pubSubPresenter.onServiceConnected(mXmppService.getXMPPConnection());
+			
 		}
 	};
 
@@ -146,14 +165,14 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 		
-		private ArrayMap<String,Fragment> mFragments = new ArrayMap<String, Fragment>();
+		private ArrayMap<String,BaseFragment> mFragments = new ArrayMap<String, BaseFragment>();
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
 
 		@Override
-		public Fragment getItem(int position) {
+		public BaseFragment getItem(int position) {
 			if(!mFragments.containsKey(""+ position)){
 				mFragments.put(""+position, createFragmentItem(position));
 			}
@@ -180,18 +199,18 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 	
-	private Fragment createFragmentItem(int position) {
+	private BaseFragment createFragmentItem(int position) {
 		BaseFragment frag = null;
 		AbstractXMPPConnection conn = mXmppService==null?null:mXmppService.getXMPPConnection();
 		switch (position) {
 		case 0:
-			frag = new ContactFragment(conn);
+			frag = new RosterFragment(conn);
 			break;
 		case 1:
 			frag = new ChatFragment(conn);
 			break;
 		case 2:
-			frag = new PubsubFragment(conn);
+			frag = new PubSubFragment(conn);
 			break;
 		default:
 			break;

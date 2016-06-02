@@ -1,4 +1,4 @@
-package com.geostar.smackandroid.pubsub;
+package com.geostar.smackandroid.pubsub.mock;
 
 import org.jivesoftware.smack.packet.ExtensionElement;
 
