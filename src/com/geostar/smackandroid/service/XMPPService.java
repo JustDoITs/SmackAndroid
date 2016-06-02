@@ -45,7 +45,12 @@ public class XMPPService extends Service {
 
 	private static final String TAG = "XMPPService";
 	
-	private ExecutorService mExecService = Executors.newFixedThreadPool(2);
+	public static ExecutorService mExecService = Executors.newFixedThreadPool(2);
+	
+    public static void doInBackground(Runnable work){
+    	mExecService.execute(work);
+    }
+    
 	
     private AbstractXMPPConnection mXmppConnection;
     private String mUsername,mPassword;
@@ -291,6 +296,7 @@ public class XMPPService extends Service {
     	return mAllChats;
     }
     
+
 
 }
 

@@ -41,9 +41,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.R.id;
-import com.geostar.smackandroid.R.layout;
-import com.geostar.smackandroid.R.menu;
 import com.geostar.smackandroid.pubsub.adapter.SubMessageAdapter;
 import com.geostar.smackandroid.pubsub.adapter.SubMessageAdapter.ContentProv;
 import com.geostar.smackandroid.service.XMPPService;
@@ -92,7 +89,6 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 				e1.printStackTrace();
 			}
 			if(node == null) return;
-			
 			node.addItemEventListener(new ItemEventListener <Item>(){
 
 				@Override
@@ -115,23 +111,51 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 				}
 				
 			});
-			try {
-				mSubcription = node.subscribe(mXmppService.getXMPPConnection().getUser());
-				Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
-				refreshSubMessages();
-//				Subscription	subscribe(String jid, SubscribeForm subForm)
-//				The user subscribes to the node using the supplied jid and subscription options.
-			} catch (NoResponseException | XMPPErrorException
-					| NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			doInBackSubscribe(node);
 		}
 	};
 	
+	private Subscription checkIfSubscribed(Node node,String userJid) throws NoResponseException, XMPPErrorException, NotConnectedException {
+		List<Subscription> subs = node.getSubscriptions();
+		for(Subscription sb : subs){
+			if(sb.getJid().contains(userJid.split("@")[0]));{
+				return sb;
+			}
+		}
+		return null;
+	}
+	
 
 
 	
+	protected void doInBackSubscribe(final Node node) {
+		XMPPService.doInBackground(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					mSubcription = checkIfSubscribed(node,mXmppService.getXMPPConnection().getUser());
+					if(mSubcription == null){
+						mSubcription = node.subscribe(mXmppService.getXMPPConnection().getUser());
+					}
+					Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
+					refreshSubMessages();
+//					Subscription	subscribe(String jid, SubscribeForm subForm)
+//					The user subscribes to the node using the supplied jid and subscription options.
+				} catch (NoResponseException | XMPPErrorException
+						| NotConnectedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -235,39 +259,65 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 
 	/** 刷新订阅消息列表 */
 	private void refreshSubMessages() {
-		// TODO Auto-generated method stub
-		if(mXmppService != null && mXmppService.getXMPPConnection() != null 
-				&& mXmppService.getXMPPConnection().isConnected() && adapter != null){
-			PubSubManager mang = new PubSubManager(mXmppService.getXMPPConnection());
-			Node node = null;
-			try {
-				node = mang.getNode(mNodeName);
-				if(node == null) return;
-				if(node instanceof LeafNode){
-					LeafNode lfn = (LeafNode) node;
+		Runnable work = new Runnable() {
+			
+			@Override
+			public void run() {
+				if(mXmppService != null && mXmppService.getXMPPConnection() != null 
+						&& mXmppService.getXMPPConnection().isConnected() && adapter != null){
+					PubSubManager mang = new PubSubManager(mXmppService.getXMPPConnection());
+					Node node = null;
+					try {
+						node = mang.getNode(mNodeName);
+						if(node == null) return;
+						if(node instanceof LeafNode){
+							LeafNode lfn = (LeafNode) node;
+							
+//							mSubMessages = lfn.getItems("hanlyjiang@geo-hanly");
+							Collection<? extends Item> items = lfn.getItems(mSubcription.getId());
+							mSubMessages.clear();
+							mSubMessages.addAll(items);
+							// 倒序显示，最近的在最上面
+							Collections.reverse(mSubMessages);
+							if( ViewSubMsgActivity.this.getListView() != null ){
+								getListView().post(new Runnable() {
+									
+									@Override
+									public void run() {
+										adapter.notifyDataSetChanged();
+									}
+								});
+							}
+							
+							// refresh
+						}else{
+							getListView().post(new Runnable() {
+								
+								@Override
+								public void run() {
+									Toast.makeText(ViewSubMsgActivity.this, "不是子节点", 2).show();
+								}
+							});
+						}
+					} catch (NoResponseException | XMPPErrorException
+							| NotConnectedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
-//					mSubMessages = lfn.getItems("hanlyjiang@geo-hanly");
-					Collection<? extends Item> items = lfn.getItems(mSubcription.getId());
-					mSubMessages.clear();
-					mSubMessages.addAll(items);
-					// 倒序显示，最近的在最上面
-					Collections.reverse(mSubMessages);
 					
-					adapter.notifyDataSetChanged();
-					// refresh
 				}else{
-					Toast.makeText(this, "不是子节点", 2).show();
+					getListView().post(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(ViewSubMsgActivity.this, "未连接，请登录后再试", 5).show();
+						}
+					});
 				}
-			} catch (NoResponseException | XMPPErrorException
-					| NotConnectedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-			
-			
-		}else{
-			Toast.makeText(this, "未连接，请登录后再试", 5).show();
-		}
+		};
+		XMPPService.doInBackground(work);
 		
 	}
 

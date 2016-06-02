@@ -14,8 +14,14 @@ import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 
+import android.util.Log;
+
+import com.geostar.smackandroid.service.XMPPService;
+
 
 public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListener<Item> {
+
+	private static final String TAG = "PubSubPresenter";
 
 	private AbstractXMPPConnection mConnection;
 	
@@ -58,19 +64,29 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		}else{
 			mPubsView.showAllSubscribleNode(afs);
 			
-			Node node = null;
-			for(Affiliation af : afs){
-				try {
-					node = mPubsubManager.getNode(af.getNodeId());
-				} catch (NoResponseException | XMPPErrorException
-						| NotConnectedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			final List<Affiliation> ff = afs; 
+			XMPPService.doInBackground(new Runnable() {
+				@Override
+				public void run() {
+					regListenersToNode(ff);
 				}
-				if(node != null && node instanceof LeafNode){
-					// 为每一个节点注册监听
-					node.addItemEventListener(this);
-				}
+			});
+		}
+	}
+
+	private void regListenersToNode(List<Affiliation> afs) {
+		Node node = null;
+		for(Affiliation af : afs){
+			try {
+				node = mPubsubManager.getNode(af.getNodeId());
+			} catch (NoResponseException | XMPPErrorException
+					| NotConnectedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(node != null && node instanceof LeafNode){
+				// 为每一个节点注册监听
+				node.addItemEventListener(this);
 			}
 		}
 	}
@@ -96,13 +112,17 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		return mPubsubManager.getAffiliations();
 	}
 
+	/**
+	 * 来自 ItemEventListener 
+	 * <br/>
+	 */
 	@Override
 	public void handlePublishedItems(ItemPublishEvent<Item> items) {
-		// TODO 有问题，暂时屏蔽
-//		String nodeId = items.getNodeId();
-//		mPubsView.notifyNewPubMessageFromBackgroud(nodeId,items.getItems().size());
+		// TODO 
+		Log.e(TAG,"handlePublishedItems:" + items.getNodeId() + items.getItems().get(0).getId());
+		String nodeId = items.getNodeId();
+		mPubsView.notifyNewPubMessageFromBackgroud(nodeId,items.getItems().size());
 	}
-
 
 
 }
