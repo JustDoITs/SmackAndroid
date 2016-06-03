@@ -31,7 +31,7 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 		if(mConnection != null && mConnection.isConnected()){
 			mRoster = Roster.getInstanceFor(mConnection);
 			mRoster.addRosterListener(this);
-			mContactView.showContactList(getAllRosterEntrys());
+			mContactView.showContactGrpList(getRosterGroups());
 		}else{
 			System.out.println("------ ERROR: connnect not connected!!!");
 		}
@@ -39,7 +39,7 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 
 	@Override
 	public void start() {
-		mContactView.showContactList(getAllRosterEntrys());
+		mContactView.showContactGrpList(getRosterGroups());
 	}
 
 	
@@ -51,6 +51,7 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 		}
 		return null;
 	}
+	
 
 	@Override
 	public Roster getRoster() {
@@ -74,23 +75,31 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 
 	@Override
 	public void presenceChanged(Presence presence) {
-		List<RosterEntry> ent = getAllRosterEntrys();
+		List<RosterGroup> ent = getRosterGroups();
 		if(ent != null){
 			mContactView.updateContactListFromBackground(ent);
 		}
 	}
 	
 	public void updateContactLists() {
-		List<RosterEntry> ent = getAllRosterEntrys();
+		List<RosterGroup> ent = getRosterGroups();
 		if(ent != null){
 			mContactView.updateContactList(ent);
 		}
 		Collection<RosterGroup> grps = getRoster().getGroups();
-//		for( RosterGroup grp : grps ){
-//			grp.getName();
-//			grp.getEntries();
-//		}
 		
 	}
+
+	List<RosterGroup> grp;
+	@Override
+	public List<RosterGroup> getRosterGroups() {
+		if(grp == null){
+			grp = new ArrayList<RosterGroup>();
+		}
+		grp.clear();
+		grp.addAll(mRoster.getGroups());
+		return grp;
+	}
+	
 
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterGroup;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,10 +20,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
 
 import com.geostar.smackandroid.BaseFragment;
@@ -40,12 +41,14 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	
-	private List<RosterEntry> mRostersData = new ArrayList<RosterEntry>();
+	private List<RosterGroup> mRostersData = new ArrayList<RosterGroup>();
 	private ContactAdapter mAdapter;
 	
 	private Map<String,List<Message>> mUnReadMessages = new ArrayMap<String, List<Message>>();
 	
 	private IChatMsgSubject mChatMsgSubject;
+
+	
 	
 	
 	@Override
@@ -65,7 +68,8 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		getListView().setOnItemClickListener(mOnContactClick);
+//		getListView().setOnItemClickListener(mOnContactClick);
+		getListView().setOnChildClickListener(onChildClickListener);
 		super.onViewCreated(view, savedInstanceState);
 	}
 
@@ -91,57 +95,57 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		super.onStop();
 	}
 	
-	class ContactAdapter extends BaseAdapter{
+	class ContactAdapter extends BaseExpandableListAdapter{
 
-		private List<RosterEntry> mData;
+		private List<RosterGroup> mData;
 		
-		public ContactAdapter(List<RosterEntry> data) {
+		public ContactAdapter(List<RosterGroup> mRostersData) {
 			super();
-			this.mData = data;
+			this.mData = mRostersData;
 		}
 
 		@Override
-		public int getCount() {
-			return mData.size();
+		public RosterEntry getChild(int i, int j) {
+			return getGroup(i).getEntries().get(j);
 		}
 
 		@Override
-		public RosterEntry getItem(int position) {
-			return mData.get(position);
+		public long getChildId(int i, int j) {
+			return j;
 		}
 
 		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getChildView(int i, int j, boolean flag, View convertView,
+				ViewGroup viewgroup) {
 			ViewHolder holder = null;
-			if(convertView == null){
-				convertView = View.inflate(parent.getContext(), R.layout.listitem_contact, null);
+			if (convertView == null) {
+				convertView = View.inflate(getActivity(),
+						R.layout.listitem_contact, null);
 				holder = new ViewHolder(convertView);
 				convertView.setTag(holder);
-			}else{
+			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			RosterEntry entry = getItem(position);
+			RosterEntry entry = getChild(i, j);
 			String userName = entry.getUser().split("@")[0];
 			holder.user.setText(userName);
-			
+
 			Presence pre = mPresenter.getRoster().getPresence(entry.getUser());
-			String nickname = TextUtils.isEmpty(entry.getName())?"":("("+ entry.getName()+")" );
-			holder.state.setText(nickname + (pre.getStatus()==null?"":pre.getStatus()));
-			
-			if(mUnReadMessages.containsKey(userName)){
-				holder.redDot.setText(mUnReadMessages.get(userName).size() + "");
+			String nickname = TextUtils.isEmpty(entry.getName()) ? "" : ("("
+					+ entry.getName() + ")");
+			holder.state.setText(nickname
+					+ (pre.getStatus() == null ? "" : pre.getStatus()));
+
+			if (mUnReadMessages.containsKey(userName)) {
+				holder.redDot
+						.setText(mUnReadMessages.get(userName).size() + "");
 				holder.redDot.setVisibility(View.VISIBLE);
-			}else{
+			} else {
 				holder.redDot.setVisibility(View.GONE);
 			}
 			return convertView;
 		}
-		
+
 		class ViewHolder {
 			TextView user;
 			TextView state;
@@ -154,12 +158,55 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 			}
 		}
 		
+		@Override
+		public int getChildrenCount(int i) {
+			return getGroup(i).getEntryCount();
+		}
+
+		@Override
+		public RosterGroup getGroup(int i) {
+			return mData.get(i);
+		}
+
+		@Override
+		public int getGroupCount() {
+			return mData.size();
+		}
+
+		@Override
+		public long getGroupId(int i) {
+			return i;
+		}
+
+		@Override
+		public View getGroupView(int i, boolean flag, View view,
+				ViewGroup viewgroup) {
+			if(view == null){
+				view = View.inflate(getContext(), android.R.layout.simple_list_item_1, null);
+			}
+			TextView title = (TextView) view.findViewById(android.R.id.text1);
+			title.setText(getGroup(i).getName());
+			return view;
+		}
+
+		@Override
+		public boolean hasStableIds() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isChildSelectable(int i, int j) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
 	}
 
 	@Override
 	public void onRefresh() {
 		if(mPresenter != null){
-			updateContactList(mPresenter.getAllRosterEntrys());
+			updateContactList(mPresenter.getRosterGroups());
 		}
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
@@ -178,14 +225,15 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		startActivity(intent);
 	}
 
-	private OnItemClickListener mOnContactClick = new OnItemClickListener(){
-
+	private OnChildClickListener onChildClickListener = new OnChildClickListener() {
+		
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			RosterEntry touser = mRostersData.get(position);
+		public boolean onChildClick(ExpandableListView expandablelistview,
+				View view, int i, int j, long l) {
+			// TODO Auto-generated method stub
+			RosterEntry touser = mAdapter.getChild(i, j);
 			if(touser == null){
-				return ;
+				return false;
 			}
 			
 			String userKey = touser.getUser().split("@")[0];
@@ -194,8 +242,10 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 				mUnReadMessages.remove(userKey);
 				mAdapter.notifyDataSetChanged();
 			}
+			return true;
 		}
 	};
+	
 
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -203,26 +253,11 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	}
 
 
-	@Override
-	public void showContactList(@NonNull List<RosterEntry> contacts) {
-		
-		mRostersData = contacts;
-		mAdapter = new ContactAdapter(mRostersData);
-		if( getView() != null){
-			getListView().setAdapter(mAdapter);
-		}
-	}
-
 
 	@Override
-	public void updateContactList(@NonNull List<RosterEntry> entry) {
+	public void updateContactList(@NonNull List<RosterGroup> entry) {
 		if(mRostersData != null && mAdapter != null){
-//			mRostersData.clear();
-//			mRostersData.addAll(entry);
-//			mAdapter.notifyDataSetChanged();
-//			getListView().invalidate();
-//		}else{
-			showContactList(entry);
+			showContactGrpList(entry);
 		}
 	}
 
@@ -230,7 +265,7 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	 * 供后台线程调用
 	 */
 	@Override
-	public void updateContactListFromBackground(final List<RosterEntry> entry) {
+	public void updateContactListFromBackground(final List<RosterGroup> entry) {
 		if(getView() == null){
 			Log.e(TAG,"View 还没有初始化");
 			return;
@@ -268,6 +303,21 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 				}
 			});
 		}
+	}
+
+
+	@Override
+	public void showContactGrpList(List<RosterGroup> grps) {
+		mRostersData = grps;
+		mAdapter = new ContactAdapter(mRostersData);
+		if( getView() != null){
+			getListView().setAdapter(mAdapter);
+		}
+	}
+	
+	@Override
+	public ExpandableListView getListView() {
+		return (ExpandableListView)super.getListView();
 	}
 
 }
