@@ -43,15 +43,6 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 		mContactView.showContactList(getAllRosterEntrys());
 	}
 
-	@Override
-	public void onServiceConnected(AbstractXMPPConnection conn) {
-//		mConnection = conn;
-//		mRoster = Roster.getInstanceFor(conn);
-//		List<RosterEntry> ent = getAllRosterEntrys();
-//		if(ent != null){
-//			mContactView.showContactList(ent);
-//		}
-	}
 	
 	public List<RosterEntry> getAllRosterEntrys() {
 		if(mRoster != null){
@@ -102,5 +93,6 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

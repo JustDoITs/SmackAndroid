@@ -127,15 +127,6 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		}
 	}
 
-	@Override
-	public void onServiceConnected(AbstractXMPPConnection conn) {
-//		mConnection = conn;
-//		mRoster = Roster.getInstanceFor(conn);
-//		List<RosterEntry> ent = getAllRosterEntrys();
-//		if(ent != null){
-//			mContactView.showContactList(ent);
-//		}
-	}
 	
 
 	@Override

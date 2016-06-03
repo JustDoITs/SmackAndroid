@@ -26,6 +26,6 @@
         android:id="@+id/btn_submit_or_reg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:hint="登录或注册" />
+        android:hint="登录" />
 
 </LinearLayout>

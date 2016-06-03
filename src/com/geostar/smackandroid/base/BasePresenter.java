@@ -5,7 +5,7 @@ package com.geostar.smackandroid.base;
  * @author jianghanghang
  *
  */
-public interface BasePresenter extends ServiceConnectLT{
+public interface BasePresenter /*extends ServiceConnectLT*/{
 
 	void start();
 	

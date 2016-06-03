@@ -71,13 +71,13 @@ public class MainActivity extends FragmentActivity {
 			frag.setChatMsgSubject(mXmppService);
 			BasePresenter contactPresenter = new RosterPresenter(
 					mXmppService.getXMPPConnection(), frag);
-			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
+//			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
 			// 注册消息监听
 			
 			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(PAGE_PUBSUB);
 			BasePresenter pubSubPresenter = new PubSubPresenter(
 					mXmppService.getXMPPConnection(), pf);
-			pubSubPresenter.onServiceConnected(mXmppService.getXMPPConnection());
+//			pubSubPresenter.onServiceConnected(mXmppService.getXMPPConnection());
 			
 			getActionBar().setTitle(mXmppService.getXMPPConnection().getUser().split("@")[0]);
 		}

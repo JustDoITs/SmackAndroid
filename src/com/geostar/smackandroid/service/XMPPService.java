@@ -22,6 +22,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -36,10 +37,9 @@ import android.text.TextUtils;
 
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.chat.ChatActivity;
-import com.geostar.smackandroid.utils.NetworkChangeReceiver;
 import com.geostar.smackandroid.utils.Utils;
 /**
- * 默认的服务器设置（IP 端口 服务名）配置在string.xml 中
+ * 默认的服务器设置（IP 端口 服务名）配置在 xml 中
  * @author jianghanghang
  *
  */
@@ -68,8 +68,6 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     private static final int DEFAULT_NOTI_ID = 0x90;
     
     private Chat mCurChat;
-    private List<String> mChatThreads = new ArrayList<String>();
-    private List<Chat> mAllChats = new ArrayList<Chat>();
     
     /** 未通知的聊天消息 */
     private List<Message> mNewUnReadMessages = new ArrayList<Message>();
@@ -81,7 +79,7 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     	super.onCreate();
     	// 为自己注册一个消息观察
     	registerChatMessageObserver(this);
-    	NetworkChangeReceiver recv = new NetworkChangeReceiver();
+//    	NetworkChangeReceiver recv = new NetworkChangeReceiver();
 //    	recv.addNetworkChangeListener(listener);
     }
 
@@ -200,9 +198,6 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
                     mCurChat = chatmanager.createChat(toUser,mDefaultMsgListener);
                 }
 
-                if(!mChatThreads.contains(mCurChat.getThreadID())){
-                    mChatThreads.add(mCurChat.getThreadID());
-                }
                 try {
                     mCurChat.sendMessage(msg);
                 } catch (SmackException.NotConnectedException e) {
@@ -344,22 +339,8 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	}
 
 	@Override
-	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {// 自己就是，不需要做什么
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {// 自己就是Subject，do nothing
 	}
 
-	
-    /**           no use          */
-    public void addChatThread(Chat chat){
-    	if(!mChatThreads.contains(chat.getThreadID())){
-    		mAllChats.add(chat);
-    		mChatThreads.add(chat.getThreadID());
-    		
-    	}
-    }
-    
-    /**           no use          */
-    public List<Chat> getAllChatThread(){
-    	return mAllChats;
-    }
 }
 
