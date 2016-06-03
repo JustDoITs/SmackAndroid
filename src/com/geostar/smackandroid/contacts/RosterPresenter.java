@@ -3,8 +3,6 @@ package com.geostar.smackandroid.contacts;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
@@ -15,7 +13,7 @@ import org.jivesoftware.smack.roster.RosterListener;
 import com.geostar.smackandroid.contacts.RosterContract.View;
 
 
-public class RosterPresenter implements RosterContract.Presenter ,RosterListener,Observer {
+public class RosterPresenter implements RosterContract.Presenter ,RosterListener {
 
 	private Roster mRoster;
 	
@@ -87,12 +85,5 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 			mContactView.updateContactList(ent);
 		}
 	}
-
-	@Override
-	public void update(Observable observable, Object data) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }

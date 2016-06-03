@@ -2,15 +2,13 @@ package com.geostar.smackandroid.chat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 
 
-public class ChatPresenter implements ChatContract.Presenter, Observer {
+public class ChatPresenter implements ChatContract.Presenter{
 
 	private Roster mRoster;
 	
@@ -46,12 +44,6 @@ public class ChatPresenter implements ChatContract.Presenter, Observer {
 		return null;
 	}
 
-
-	@Override
-	public void update(Observable observable, Object data) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 	@Override
