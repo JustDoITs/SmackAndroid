@@ -1,15 +1,19 @@
 package com.geostar.smackandroid.contacts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.RosterEntry;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -20,14 +24,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.chat.ChatActivity;
 import com.geostar.smackandroid.contacts.RosterContract.Presenter;
+import com.geostar.smackandroid.service.IChatMsgObserver;
 
-public class RosterFragment extends BaseFragment implements RosterContract.View,OnRefreshListener{
+public class RosterFragment extends BaseFragment implements RosterContract.View,OnRefreshListener,IChatMsgObserver{
 	
 	private static final String TAG = "RosterFragment";
 
@@ -37,6 +43,8 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	private List<RosterEntry> mRostersData = new ArrayList<RosterEntry>();
 	private ContactAdapter mAdapter;
+	
+	private Map<String,List<Message>> mUnReadMessages = new ArrayMap<String, List<Message>>();
 	
 
 	public RosterFragment(AbstractXMPPConnection conn) {
@@ -102,23 +110,32 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 			}else{
 				holder = (ViewHolder) convertView.getTag();
 			}
-			
 			RosterEntry entry = getItem(position);
-			holder.user.setText(entry.getUser().split("@")[0]);
+			String userName = entry.getUser().split("@")[0];
+			holder.user.setText(userName);
 			
 			Presence pre = mPresenter.getRoster().getPresence(entry.getUser());
 			String nickname = TextUtils.isEmpty(entry.getName())?"":("("+ entry.getName()+")" );
 			holder.state.setText(nickname + (pre.getStatus()==null?"":pre.getStatus()));
+			
+			if(mUnReadMessages.containsKey(userName)){
+				holder.redDot.setText(mUnReadMessages.get(userName).size() + "");
+				holder.redDot.setVisibility(View.VISIBLE);
+			}else{
+				holder.redDot.setVisibility(View.GONE);
+			}
 			return convertView;
 		}
 		
 		class ViewHolder {
 			TextView user;
 			TextView state;
+			Button redDot;
 			
 			ViewHolder(View convertView){
 				user = (TextView) convertView.findViewById(R.id.tv_username);
 				state = (TextView) convertView.findViewById(R.id.tv_presence);
+				redDot = (Button) convertView.findViewById(R.id.btn_redot);
 			}
 		}
 		
@@ -132,9 +149,17 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
 	
-	private void goToChatActivity(RosterEntry touser) {
+	private void goToChatActivity(RosterEntry touser,List<Message> msgs) {
+		ArrayList<String> strMessages = null;
+		if(msgs != null){
+			strMessages = new ArrayList<String>();
+			for(Message msg: msgs){
+				strMessages.add(msg.getBody());
+			}
+		}
 		Intent intent = new Intent(getActivity(),ChatActivity.class);
-		intent.putExtra("user",touser.getUser() );
+		intent.putExtra(ChatActivity.KEY_USER,touser.getUser() );
+		intent.putStringArrayListExtra(ChatActivity.KEY_MSG, strMessages);
 		startActivity(intent);
 	}
 
@@ -147,7 +172,13 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 			if(touser == null){
 				return ;
 			}
-			goToChatActivity(touser);
+			
+			String userKey = touser.getUser().split("@")[0];
+			goToChatActivity(touser,mUnReadMessages.get(userKey));
+			if(mUnReadMessages.containsKey(userKey)){
+				mUnReadMessages.remove(userKey);
+				mAdapter.notifyDataSetChanged();
+			}
 		}
 	};
 
@@ -193,6 +224,32 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 				updateContactList(entry);
 			}
 		});
+	}
+
+	/**
+	 * 接收到新的消息
+	 */
+	@Override
+	public void update(List<Message> msgs) {
+		for(Message msg: msgs){
+			String username = msg.getFrom().split("@")[0];
+			if(mUnReadMessages.containsKey(username) ){
+				mUnReadMessages.get(username).add(msg);
+			}else{
+				List<Message> msgList = new ArrayList<Message>();
+				msgList.add(msg);
+				mUnReadMessages.put(username, msgList);
+			}
+		}
+		if(getView()!= null){
+			getView().post(new Runnable() {
+				
+				@Override
+				public void run() {
+					mAdapter.notifyDataSetChanged();
+				}
+			});
+		}
 	}
 
 }

@@ -134,16 +134,14 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
+					// 先查询是否有订阅，避免重复订阅，因为Openfire 支持 一个用户订阅多次，而且默认开启
 					mSubcription = checkIfSubscribed(node,mXmppService.getXMPPConnection().getUser());
 					if(mSubcription == null){
 						mSubcription = node.subscribe(mXmppService.getXMPPConnection().getUser());
 					}
 					Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
 					refreshSubMessages();
-//					Subscription	subscribe(String jid, SubscribeForm subForm)
-//					The user subscribes to the node using the supplied jid and subscription options.
 				} catch (NoResponseException | XMPPErrorException
 						| NotConnectedException e) {
 					// TODO Auto-generated catch block
@@ -152,9 +150,6 @@ public class ViewSubMsgActivity extends ListActivity implements OnRefreshListene
 			}
 		});
 	}
-
-
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

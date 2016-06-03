@@ -74,9 +74,14 @@ public class SubsAdapter extends BaseAdapter {
 		return convertView;
 	}
 	
-	
+	/** 添加未读计数 */
 	public void addNewMessageFlag(String nodeId,int num){
-		hasNewMessageNode.put(nodeId, num);
+		int unreadTotal = num;
+		if(hasNewMessageNode.containsKey(nodeId)){
+			unreadTotal += hasNewMessageNode.get(nodeId).intValue();
+			
+		}
+		hasNewMessageNode.put(nodeId, unreadTotal);
 	}
 	
 	public void removeNewMessgeFlag(String nodeId){

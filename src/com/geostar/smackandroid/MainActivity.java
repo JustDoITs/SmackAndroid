@@ -73,6 +73,8 @@ public class MainActivity extends FragmentActivity {
 			BasePresenter contactPresenter = new RosterPresenter(
 					mXmppService.getXMPPConnection(), frag);
 			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
+			// 注册消息监听
+			mXmppService.registerChatMessageObserver(frag);
 			
 			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(2);
 			BasePresenter pubSubPresenter = new PubSubPresenter(
@@ -81,6 +83,7 @@ public class MainActivity extends FragmentActivity {
 			
 		}
 	};
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -238,6 +241,9 @@ public class MainActivity extends FragmentActivity {
 			unbindService(mServiceConnection);
 			mServiceConnection =null;
 		}
+		RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(0);
+		// 注册消息监听
+		mXmppService.unregisterChatMessageObserver(frag);
 		super.onDestroy();
 	}
 	

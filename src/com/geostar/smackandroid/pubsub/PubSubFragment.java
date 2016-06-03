@@ -140,14 +140,13 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 	
 	
 	@Override
-	public void notifyNewPubMessageFromBackgroud(final String nodeId,final int howMany) {
+	public void onNewPubMsgComeFromBackgroudThread(final String nodeId,final int howMany) {
 		// TODO Auto-generated method stub
 		if(getView() != null){
 			getView().post(new Runnable() {
 				
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					if(mSubsAdapter != null){
 						mSubsAdapter.addNewMessageFlag(nodeId, howMany);
 						mSubsAdapter.notifyDataSetChanged();

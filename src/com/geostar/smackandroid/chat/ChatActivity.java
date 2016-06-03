@@ -61,7 +61,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	/** 进入时消息 */
-	private String firstInMsg;
+	private List<String> firstInMsg;
 	
 	private  XMPPService getXmppService(){
 		return mXmppService;
@@ -107,7 +107,9 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	protected void initListView() {
 		mAdapter = new ChatAdapter(this, mMsgLists);
 		if(firstInMsg != null){
-			mMsgLists.add(new Message("me", firstInMsg));
+			for(String msgContent : firstInMsg){
+				mMsgLists.add(new Message("me", msgContent));
+			}
 		}
 		getListView().setAdapter(mAdapter);
 	}
@@ -122,6 +124,9 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	}
 	
 
+	public static final String KEY_MSG = "message";
+	public static final String KEY_USER = "user";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -132,8 +137,8 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 				finish();
 			}
 			
-			mChatOjb = args.getStringExtra("user");
-			firstInMsg = args.getStringExtra("msg");
+			mChatOjb = args.getStringExtra(KEY_USER);
+			firstInMsg = args.getStringArrayListExtra(KEY_MSG);
 			
 			if(TextUtils.isEmpty(mChatOjb)){
 				finish();

@@ -18,10 +18,17 @@ import android.util.Log;
 
 import com.geostar.smackandroid.service.XMPPService;
 
-
+/**
+ * 
+ * @author jianghanghang
+ *
+ * 目前没有存储，所以订阅列表数据每次全部替换
+ */
 public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListener<Item> {
 
 	private static final String TAG = "PubSubPresenter";
+	
+	private static boolean hasRegisterListener = false;
 
 	private AbstractXMPPConnection mConnection;
 	
@@ -36,7 +43,6 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		contactView.setPresenter(this);
 		if(mConnection != null && mConnection.isConnected()){
 			mPubsubManager = new PubSubManager(mConnection);
-			// TODO: 
 		}else{
 			System.out.println("------ ERROR: connnect not connected!!!");
 		}
@@ -64,14 +70,42 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		}else{
 			mPubsView.showAllSubscribleNode(afs);
 			
-			final List<Affiliation> ff = afs; 
-			XMPPService.doInBackground(new Runnable() {
-				@Override
-				public void run() {
-					regListenersToNode(ff);
-				}
-			});
+			// TODO: 针对每一节点记录是否订阅
+			if(!hasRegisterListener){
+				registerEventListenerForAllNode();
+				hasRegisterListener = true;
+			}
 		}
+	}
+
+	/** 
+	 * 为每一个节点注册监听, 这里没有考虑到新加节点的注册
+	 * <br/> 需要避免重复注册
+	 */
+	public void registerEventListenerForAllNode() {
+		if(mConnection != null && mConnection.isConnected()){
+			mPubsubManager = new PubSubManager(mConnection);
+			// TODO: 
+		}
+		
+		List<Affiliation> afs = null;
+		try {
+			afs = mPubsubManager.getAffiliations();
+		} catch (NoResponseException | XMPPErrorException
+				| NotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		final List<Affiliation> ff = afs; 
+		XMPPService.doInBackground(new Runnable() {
+			@Override
+			public void run() {
+//				if(!hasRegisterListener){
+					regListenersToNode(ff);
+//					hasRegisterListener = true;
+//				}
+			}
+		});
 	}
 
 	private void regListenersToNode(List<Affiliation> afs) {
@@ -85,7 +119,9 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 				e.printStackTrace();
 			}
 			if(node != null && node instanceof LeafNode){
-				// 为每一个节点注册监听
+				// 为每一个节点注册监听,
+				Log.e(TAG,"addItemEventListener== node =" + node.getId());
+//				node.removeItemEventListener(this);
 				node.addItemEventListener(this);
 			}
 		}
@@ -111,6 +147,12 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 	public List<Affiliation> getAffiliations() throws NoResponseException, XMPPErrorException, NotConnectedException {
 		return mPubsubManager.getAffiliations();
 	}
+	
+	@Override
+	public void subscribeToNode(String nodeId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 * 来自 ItemEventListener 
@@ -121,8 +163,10 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		// TODO 
 		Log.e(TAG,"handlePublishedItems:" + items.getNodeId() + items.getItems().get(0).getId());
 		String nodeId = items.getNodeId();
-		mPubsView.notifyNewPubMessageFromBackgroud(nodeId,items.getItems().size());
+		mPubsView.onNewPubMsgComeFromBackgroudThread(nodeId,items.getItems().size());
 	}
+
+
 
 
 }
