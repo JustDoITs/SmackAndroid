@@ -70,9 +70,6 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 	
 	private Map<String,Integer> hasNewMessageNode = new HashMap<String,Integer>();
 
-	public PubSubFragment(AbstractXMPPConnection conn) {
-		super(conn);
-	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -314,7 +311,7 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 		}
 		if(allRels == null) return;
 		
-		String curJid = getXMPPConnection().getUser();
+		String curJid = mPresenter.getCurrentUser();
 		boolean isSubcribled = false;
 		for(Subscription s : allRels){
 			if(curJid.contains(s.getJid())){
@@ -338,7 +335,7 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 		}
 		
 		try {
-			mSubcription = node.subscribe(getXMPPConnection().getUser());
+			mSubcription = node.subscribe(mPresenter.getCurrentUser());
 			Log.d(TAG,"-------------------- Subscription:" + mSubcription.toString());
 //			Subscription	subscribe(String jid, SubscribeForm subForm)
 //			The user subscribes to the node using the supplied jid and subscription options.

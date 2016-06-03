@@ -48,9 +48,6 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	private IChatMsgSubject mChatMsgSubject;
 	
-	public RosterFragment(AbstractXMPPConnection conn) {
-		super(conn);
-	}
 	
 	@Override
 	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {

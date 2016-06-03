@@ -47,6 +47,8 @@ public interface PubSubContract {
 
 	interface Presenter extends BasePresenter {
 
+		String getCurrentUser();
+		
 		/**
 		 * 返回订阅管理器的实例
 		 * @return

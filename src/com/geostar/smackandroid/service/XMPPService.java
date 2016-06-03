@@ -315,22 +315,6 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     };
     
     
-    /**           no use          */
-    public void addChatThread(Chat chat){
-    	if(!mChatThreads.contains(chat.getThreadID())){
-    		mAllChats.add(chat);
-    		mChatThreads.add(chat.getThreadID());
-    		
-    	}
-    }
-    
-    /**           no use          */
-    public List<Chat> getAllChatThread(){
-    	return mAllChats;
-    }
-
-
-    
     /* 聊天消息观察者相关  */
 	@Override
 	public void registerChatMessageObserver(IChatMsgObserver obs) {
@@ -360,10 +344,22 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	}
 
 	@Override
-	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
-		// 自己就是，不需要做什么
-		
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {// 自己就是，不需要做什么
 	}
 
+	
+    /**           no use          */
+    public void addChatThread(Chat chat){
+    	if(!mChatThreads.contains(chat.getThreadID())){
+    		mAllChats.add(chat);
+    		mChatThreads.add(chat.getThreadID());
+    		
+    	}
+    }
+    
+    /**           no use          */
+    public List<Chat> getAllChatThread(){
+    	return mAllChats;
+    }
 }
 

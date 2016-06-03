@@ -166,6 +166,11 @@ public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListen
 		mPubsView.onNewPubMsgComeFromBackgroudThread(nodeId,items.getItems().size());
 	}
 
+	@Override
+	public String getCurrentUser() {
+		return mConnection.getUser();
+	}
+
 
 
 }

@@ -2,8 +2,6 @@ package com.geostar.smackandroid;
 
 import java.util.Locale;
 
-import org.jivesoftware.smack.AbstractXMPPConnection;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Service;
@@ -65,9 +63,10 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
-			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
-				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
-			}
+//			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
+//				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
+//			}
+			
 			RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(PAGE_ROSTER);
 			frag.setChatMsgSubject(mXmppService);
 			BasePresenter contactPresenter = new RosterPresenter(
@@ -194,16 +193,15 @@ public class MainActivity extends FragmentActivity {
 	
 	private BaseFragment createFragmentItem(int position) {
 		BaseFragment frag = null;
-		AbstractXMPPConnection conn = mXmppService==null?null:mXmppService.getXMPPConnection();
 		switch (position) {
 		case 0:
-			frag = new RosterFragment(conn);
+			frag = new RosterFragment();
 			break;
 		case 1:
-			frag = new ChatFragment(conn);
+			frag = new ChatFragment();
 			break;
 		case 2:
-			frag = new PubSubFragment(conn);
+			frag = new PubSubFragment();
 			break;
 		default:
 			break;

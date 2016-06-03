@@ -14,10 +14,6 @@ import com.geostar.smackandroid.R;
 public class ChatFragment extends BaseFragment implements OnRefreshListener {
 
 
-	public ChatFragment(AbstractXMPPConnection conn) {
-		super(conn);
-		// TODO Auto-generated constructor stub
-	}
 
 
 	@Override
