@@ -1,6 +1,8 @@
 package com.geostar.smackandroid.pubsub;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException.NoResponseException;
@@ -18,6 +20,7 @@ import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 import org.jivesoftware.smackx.xdata.packet.DataForm;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,13 +39,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.pubsub.PubSubContract.Presenter;
-import com.geostar.smackandroid.pubsub.adapter.SubsAdapter;
 import com.geostar.smackandroid.pubsub.mock.ViewSubMsgActivity;
 
 /**
@@ -52,7 +57,6 @@ import com.geostar.smackandroid.pubsub.mock.ViewSubMsgActivity;
  *
  */
 public class PubSubFragment extends BaseFragment implements PubSubContract.View,OnRefreshListener{
-
 
 	private static final String TAG = "PubsubFragment";
 	
@@ -66,6 +70,8 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 	private PubSubContract.Presenter mPresenter;
 	
 	private SubsAdapter mSubsAdapter;
+	
+	private Map<String,Integer> hasNewMessageNode = new HashMap<String,Integer>();
 
 	public PubSubFragment(AbstractXMPPConnection conn) {
 		super(conn);
@@ -94,7 +100,7 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 				Affiliation affiliation = (Affiliation) parent.getAdapter().getItem(position);
 				// 获取订阅节点
 				String pubNode = affiliation.getNodeId();
-				mSubsAdapter.removeNewMessgeFlag(pubNode);
+				removeNewMessgeFlag(pubNode);
 				mSubsAdapter.notifyDataSetChanged();
 				goViewPubMessage(pubNode);
 			}
@@ -147,8 +153,8 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 				
 				@Override
 				public void run() {
+					addNewMessageFlag(nodeId, howMany);
 					if(mSubsAdapter != null){
-						mSubsAdapter.addNewMessageFlag(nodeId, howMany);
 						mSubsAdapter.notifyDataSetChanged();
 //						getListView().invalidate();
 					}
@@ -321,26 +327,8 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 		}
 		
 		if(node == null) return;
-		
-		node.addItemEventListener(new ItemEventListener <Item>(){
-
-			@Override
-			public void handlePublishedItems(final ItemPublishEvent<Item> items) {
-				// TODO Auto-generated method stub
-				if(items!= null && items.getItems().size() > 0){
-					Log.d(TAG,"-------------------- handlePublishedItems: size=" +
-								items.getItems().size() + "; "+ items.getItems().get(0).toString());
-					getView().post(new Runnable() {
-						
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							Toast.makeText(getActivity(), "收到一条订阅消息：" + items.getItems().get(0).getId(), 3).show();
-						}
-					});
-				}
-			}
-		});
+		// 为新添加的节点添加订阅消息推送通知
+		node.addItemEventListener((PubSubPresenter)mPresenter);
 		if(isSubcribled) {
 			getView().post(new Runnable() {
 				
@@ -416,6 +404,84 @@ public class PubSubFragment extends BaseFragment implements PubSubContract.View,
 		startActivity(intent);
 	}
 
+
+	/** 添加未读计数 */
+	private void addNewMessageFlag(String nodeId,int num){
+		int unreadTotal = num;
+		if(hasNewMessageNode.containsKey(nodeId)){
+			unreadTotal += hasNewMessageNode.get(nodeId).intValue();
+			
+		}
+		hasNewMessageNode.put(nodeId, unreadTotal);
+	}
 	
+	private void removeNewMessgeFlag(String nodeId){
+		hasNewMessageNode.remove(nodeId);
+	}
+	
+	
+	class SubsAdapter extends BaseAdapter {
+
+		private List<Affiliation> mDatas;
+		private Context mContext;
+	 	
+		public SubsAdapter(Context context,List<Affiliation> mDatas) {
+			super();
+			this.mDatas = mDatas;
+			mContext = context;
+		}
+
+		@Override
+		public int getCount() {
+			return mDatas.size();
+		}
+
+		@Override
+		public Affiliation getItem(int position) {
+			return mDatas.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			Holder holder = null;
+			if(convertView ==  null){
+				convertView = LayoutInflater.from(mContext).inflate(R.layout.listitem_pubs_node_item, null);
+				holder = new Holder(convertView);
+				convertView.setTag(holder);
+			}else{
+				holder = (Holder) convertView.getTag();
+			}
+			Affiliation item = getItem(position);
+			holder.title.setText(item.getNodeId());
+			holder.desc.setText(item.getType().toString());
+			holder.addSubs.setVisibility(View.GONE);
+			if(hasNewMessageNode.keySet().contains(item.getNodeId())){
+				holder.redDot.setText(hasNewMessageNode.get(item.getNodeId())  + "");
+				holder.redDot.setVisibility(View.VISIBLE);
+			}else{
+				holder.redDot.setVisibility(View.GONE);
+			}
+			return convertView;
+		}
+		
+		class Holder {
+			TextView title;
+			TextView desc;
+			Button addSubs;
+			Button redDot;
+			public Holder(View convertView) {
+				this.title = (TextView) convertView.findViewById(R.id.tv_nodename);
+				this.desc = (TextView) convertView.findViewById(R.id.tv_desc);
+				this.addSubs = (Button) convertView.findViewById(R.id.btn_subcrible);
+				this.redDot = (Button) convertView.findViewById(R.id.btn_redot);
+			}
+		}
+
+	}
 
 }
