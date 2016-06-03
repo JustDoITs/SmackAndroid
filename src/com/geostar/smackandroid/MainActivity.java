@@ -20,6 +20,7 @@ import android.view.MenuItem;
 
 import com.geostar.smackandroid.base.BasePresenter;
 import com.geostar.smackandroid.chat.ChatFragment;
+import com.geostar.smackandroid.chat.ChatPresenter;
 import com.geostar.smackandroid.contacts.RosterFragment;
 import com.geostar.smackandroid.contacts.RosterPresenter;
 import com.geostar.smackandroid.pubsub.PubSubFragment;
@@ -66,17 +67,18 @@ public class MainActivity extends FragmentActivity {
 //			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
 //				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
 //			}
-			
+			// 当连接到服务时，设置Presenter，因为登录后一般是已连接的，可以确保mXmppService.getXMPPConnection() 不为null
 			RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(PAGE_ROSTER);
 			frag.setChatMsgSubject(mXmppService);
-			BasePresenter contactPresenter = new RosterPresenter(
-					mXmppService.getXMPPConnection(), frag);
+			BasePresenter contactPresenter = new RosterPresenter(mXmppService.getXMPPConnection(), frag);
 //			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
-			// 注册消息监听
+			
+			ChatFragment cfrag = (ChatFragment)mSectionsPagerAdapter.getItem(PAGE_CHAT);
+			frag.setChatMsgSubject(mXmppService);
+			ChatPresenter chatPresenter = new ChatPresenter(mXmppService.getXMPPConnection(), cfrag);
 			
 			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(PAGE_PUBSUB);
-			BasePresenter pubSubPresenter = new PubSubPresenter(
-					mXmppService.getXMPPConnection(), pf);
+			BasePresenter pubSubPresenter = new PubSubPresenter(mXmppService.getXMPPConnection(), pf);
 //			pubSubPresenter.onServiceConnected(mXmppService.getXMPPConnection());
 			
 			getActionBar().setTitle(mXmppService.getXMPPConnection().getUser().split("@")[0]);

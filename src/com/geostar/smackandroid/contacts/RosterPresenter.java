@@ -8,6 +8,7 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterGroup;
 import org.jivesoftware.smack.roster.RosterListener;
 
 import com.geostar.smackandroid.contacts.RosterContract.View;
@@ -84,6 +85,12 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 		if(ent != null){
 			mContactView.updateContactList(ent);
 		}
+		Collection<RosterGroup> grps = getRoster().getGroups();
+//		for( RosterGroup grp : grps ){
+//			grp.getName();
+//			grp.getEntries();
+//		}
+		
 	}
 
 }
