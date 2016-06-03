@@ -36,6 +36,7 @@ import android.text.TextUtils;
 
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.chat.ChatActivity;
+import com.geostar.smackandroid.utils.NetworkChangeReceiver;
 import com.geostar.smackandroid.utils.Utils;
 /**
  * 默认的服务器设置（IP 端口 服务名）配置在string.xml 中
@@ -80,6 +81,8 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     	super.onCreate();
     	// 为自己注册一个消息观察
     	registerChatMessageObserver(this);
+    	NetworkChangeReceiver recv = new NetworkChangeReceiver();
+//    	recv.addNetworkChangeListener(listener);
     }
 
     @Override

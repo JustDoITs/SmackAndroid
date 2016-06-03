@@ -6,7 +6,7 @@ import android.util.Log;
 
 public class Utils {
 
-	
+	public static final String LOG_TAG = "Log.debug";
 	/**
 	 * 输出日志
 	 * @param tag
@@ -15,6 +15,12 @@ public class Utils {
 	public static final void logDebug(String tag,String msg){
 		if(BuildConfig.DEBUG){
 			Log.d(tag,msg);
+		}
+	}
+
+	public static void logDebug(String msg) {
+		if(BuildConfig.DEBUG){
+			Log.d(LOG_TAG,msg);
 		}
 	}
 	

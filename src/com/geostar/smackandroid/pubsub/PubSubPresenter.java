@@ -22,7 +22,7 @@ import com.geostar.smackandroid.service.XMPPService;
  * 
  * @author jianghanghang
  *
- * 目前没有存储，所以订阅列表数据每次全部替换
+ * 
  */
 public class PubSubPresenter implements PubSubContract.Presenter,ItemEventListener<Item> {
 

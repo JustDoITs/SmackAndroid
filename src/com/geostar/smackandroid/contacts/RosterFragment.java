@@ -48,14 +48,14 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	private IChatMsgSubject mChatMsgSubject;
 	
-
+	public RosterFragment(AbstractXMPPConnection conn) {
+		super(conn);
+	}
+	
+	@Override
 	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
 		this.mChatMsgSubject = chatMsgSubject;
 		mChatMsgSubject.registerChatMessageObserver(this);
-	}
-
-	public RosterFragment(AbstractXMPPConnection conn) {
-		super(conn);
 	}
 	
 	@Override
@@ -74,6 +74,7 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	}
 
 
+	
 	@Override
 	public void onResume() {
 		if(mPresenter != null){
@@ -229,6 +230,9 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		}
 	}
 
+	/**
+	 * 供后台线程调用
+	 */
 	@Override
 	public void updateContactListFromBackground(final List<RosterEntry> entry) {
 		if(getView() == null){
