@@ -8,5 +8,7 @@ public interface IChatMsgObserver {
 	
 	void update(List<Message> msgs);
 	
+	void setChatMsgSubject(IChatMsgSubject chatMsgSubject);
+	
 }
 

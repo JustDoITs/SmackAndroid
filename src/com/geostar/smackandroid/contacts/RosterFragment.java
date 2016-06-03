@@ -1,7 +1,6 @@
 package com.geostar.smackandroid.contacts;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +31,7 @@ import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.chat.ChatActivity;
 import com.geostar.smackandroid.contacts.RosterContract.Presenter;
 import com.geostar.smackandroid.service.IChatMsgObserver;
+import com.geostar.smackandroid.service.IChatMsgSubject;
 
 public class RosterFragment extends BaseFragment implements RosterContract.View,OnRefreshListener,IChatMsgObserver{
 	
@@ -46,6 +46,13 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	
 	private Map<String,List<Message>> mUnReadMessages = new ArrayMap<String, List<Message>>();
 	
+	private IChatMsgSubject mChatMsgSubject;
+	
+
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
+		this.mChatMsgSubject = chatMsgSubject;
+		mChatMsgSubject.registerChatMessageObserver(this);
+	}
 
 	public RosterFragment(AbstractXMPPConnection conn) {
 		super(conn);
@@ -73,7 +80,18 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 			mPresenter.start();
 //			updateContactList(mPresenter.getAllRosterEntrys());
 		}
+		if(mChatMsgSubject != null){
+			mChatMsgSubject.registerChatMessageObserver(this);
+		}
 		super.onResume();
+	}
+	
+	@Override
+	public void onStop() {
+		if(mChatMsgSubject != null){
+			mChatMsgSubject.unregisterChatMessageObserver(this);
+		}
+		super.onStop();
 	}
 	
 	class ContactAdapter extends BaseAdapter{

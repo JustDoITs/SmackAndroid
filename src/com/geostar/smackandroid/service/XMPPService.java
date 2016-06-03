@@ -356,5 +356,11 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 		sendMsgNotification(msgs);
 	}
 
+	@Override
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
+		// 自己就是，不需要做什么
+		
+	}
+
 }
 
