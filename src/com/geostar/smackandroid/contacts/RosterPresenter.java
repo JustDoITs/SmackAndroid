@@ -60,17 +60,26 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 
 	@Override
 	public void entriesAdded(Collection<String> addresses) {
-		updateContactLists();
+		List<RosterGroup> ent = getRosterGroups();
+		if(ent != null){
+			mContactView.updateContactListFromBackground(ent);
+		}
 	}
 
 	@Override
 	public void entriesUpdated(Collection<String> addresses) {
-		updateContactLists();
+		List<RosterGroup> ent = getRosterGroups();
+		if(ent != null){
+			mContactView.updateContactListFromBackground(ent);
+		}
 	}
 
 	@Override
 	public void entriesDeleted(Collection<String> addresses) {
-		updateContactLists();
+		List<RosterGroup> ent = getRosterGroups();
+		if(ent != null){
+			mContactView.updateContactListFromBackground(ent);
+		}
 	}
 
 	@Override
