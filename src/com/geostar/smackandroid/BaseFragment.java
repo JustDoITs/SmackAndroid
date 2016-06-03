@@ -2,9 +2,11 @@ package com.geostar.smackandroid;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 
+import com.geostar.smackandroid.base.ServiceConnectLT;
+
 import android.support.v4.app.ListFragment;
 
-public abstract class BaseFragment extends ListFragment implements OnConnectionMake{
+public abstract class BaseFragment extends ListFragment implements ServiceConnectLT{
 
 	private AbstractXMPPConnection mXmppConnection;
 	
