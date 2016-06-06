@@ -3,7 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="8dp" >
+    android:paddingLeft="24dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingRight="8dp"
+    android:descendantFocusability="beforeDescendants"
+    >
 
     <ImageView
         android:id="@+id/iv_icon"

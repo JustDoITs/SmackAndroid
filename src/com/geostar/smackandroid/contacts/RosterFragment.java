@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
 
@@ -70,6 +71,8 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 //		getListView().setOnItemClickListener(mOnContactClick);
 		getListView().setOnChildClickListener(onChildClickListener);
+		// 左边的箭头
+//		getListView().setGroupIndicator(null);
 		super.onViewCreated(view, savedInstanceState);
 	}
 
@@ -182,23 +185,24 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		public View getGroupView(int i, boolean flag, View view,
 				ViewGroup viewgroup) {
 			if(view == null){
-				view = View.inflate(getContext(), android.R.layout.simple_list_item_1, null);
+				view = View.inflate(getContext(), R.layout.group_item, null);
 			}
-			TextView title = (TextView) view.findViewById(android.R.id.text1);
+			TextView title = (TextView) view.findViewById(R.id.text);
 			title.setText(getGroup(i).getName());
 			return view;
 		}
 
 		@Override
 		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
+		/**
+		 * 
+		 */
 		@Override
 		public boolean isChildSelectable(int i, int j) {
-			// TODO Auto-generated method stub
-			return false;
+			return true;
 		}
 		
 	}
@@ -230,7 +234,6 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		@Override
 		public boolean onChildClick(ExpandableListView expandablelistview,
 				View view, int i, int j, long l) {
-			// TODO Auto-generated method stub
 			RosterEntry touser = mAdapter.getChild(i, j);
 			if(touser == null){
 				return false;
