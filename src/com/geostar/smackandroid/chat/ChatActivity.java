@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ import android.widget.Toast;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
+import com.geostar.smackandroid.utils.Utils;
 
 /**
  * 聊天
@@ -49,7 +51,11 @@ import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 public class ChatActivity extends ListActivity implements OnRefreshListener {
 
 	protected static final String TAG = "ChatActivity";
+	
+	private static final int FILE_SELECT_CODE = 0x009;
+	
 	private XMPPService mXmppService;
+	
 	/**聊天对象 */
 	private String mChatOjb;
 	private ChatAdapter mAdapter;
@@ -58,6 +64,7 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 	
 	private EditText mMsgInput;
 	private Button mMsgSendBtn;
+	private ImageButton mFileChooseBtn;
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	/** 进入时消息 */
@@ -167,7 +174,19 @@ public class ChatActivity extends ListActivity implements OnRefreshListener {
 			}
 		});
 		
+		mFileChooseBtn = (ImageButton) findViewById(R.id.ib_chat_send_more);
+		mFileChooseBtn.setOnClickListener(new OnClickListener() {
+			
+
+			@Override
+			public void onClick(View view) {
+				// TODO Auto-generated method stub
+				Utils.showFileChooser(ChatActivity.this, FILE_SELECT_CODE);
+			}
+		});
+		
 	}
+
 
 
 	/** 

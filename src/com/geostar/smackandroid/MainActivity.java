@@ -38,7 +38,7 @@ public class MainActivity extends FragmentActivity {
 
 	private static final String TAG = "MainActivity";
 
-	private static final int PAGE_NUM_3 = 3;
+	private static final int PAGE_SIZE_3 = 3;
 	
 	private static final int PAGE_ROSTER = 0;
 	private static final int PAGE_CHAT = 1;
@@ -56,17 +56,11 @@ public class MainActivity extends FragmentActivity {
 		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-//			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
-//				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceDisconnected(name);
-//			}
 		}
 		
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
-//			for(int i = 0; i<mSectionsPagerAdapter.getCount(); i++){
-//				((BaseFragment)mSectionsPagerAdapter.getItem(i)).onServiceConnected(mXmppService.getXMPPConnection());
-//			}
 			// 当连接到服务时，设置Presenter，因为登录后一般是已连接的，可以确保mXmppService.getXMPPConnection() 不为null
 			RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(PAGE_ROSTER);
 			frag.setChatMsgSubject(mXmppService);
@@ -101,12 +95,10 @@ public class MainActivity extends FragmentActivity {
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		getActionBar().setTitle(getResources().getString(R.string.app_name));
 		initActionBar();
-		mViewPager
-				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+		mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
 						mCurrentPage = position;
-//						getActionBar().setTitle(mSectionsPagerAdapter.getPageTitle(position));
 						getActionBar().selectTab(getActionBar().getTabAt(position));
 					}
 				});
@@ -148,7 +140,7 @@ public class MainActivity extends FragmentActivity {
 		};
 
 		// Add 3 tabs, specifying the tab's text and TabListener
-		for (int i = 0; i < PAGE_NUM_3; i++) {
+		for (int i = 0; i < PAGE_SIZE_3; i++) {
 			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i).toString())
 					.setTabListener(tabListener));
 		}
@@ -176,7 +168,7 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			return PAGE_NUM_3;
+			return PAGE_SIZE_3;
 		}
 		@Override
 		public CharSequence getPageTitle(int position) {
@@ -270,12 +262,17 @@ public class MainActivity extends FragmentActivity {
 			return true;
 		}
 		if (id == R.id.action_exit) { // 退出应用
-			mXmppService.logout();//登出 
-			mXmppService.stopSelf();//停止服务
-			finish();
+			exitApp();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	
+	private void exitApp() {
+		mXmppService.logout();//登出 
+		mXmppService.stopSelf();//停止服务
+		finish();
 	}
 
 }

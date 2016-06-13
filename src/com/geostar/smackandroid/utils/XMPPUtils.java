@@ -7,18 +7,21 @@ import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.sasl.SASLErrorException;
 
+import android.util.Log;
+
 public class XMPPUtils {
 
 	/**
-	 * 简单处理下XMPP的异常信息
+	 * 简单处理下XMPP的登录异常信息
 	 * @param e
-	 * @return
+	 * @return 异常信息
 	 */
 	public static String resloveLoginException(Exception e){
 		if(e instanceof XMPPException){
 			if(e instanceof XMPPErrorException){
 				XMPPErrorException erp = (XMPPErrorException) e;
 				XMPPError.Type type = erp.getXMPPError().getType();
+				Log.e("XMPPException","XMPPError type:" + type);
 			}
 			if(e instanceof SASLErrorException){
 				return "登录失败：用户名或密码错误";
@@ -30,4 +33,5 @@ public class XMPPUtils {
 		}
 		return "未知错误";
 	}
+	
 }

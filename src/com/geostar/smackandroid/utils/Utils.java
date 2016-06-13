@@ -7,15 +7,21 @@ import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.sasl.SASLErrorException;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.geostar.smackandroid.BuildConfig;
 
 public class Utils {
 
 	public static final String LOG_TAG = "Log.debug";
+	
 	/**
 	 * 输出日志
+	 * <br/>
+	 * 需要 BuildConfig.DEBUG = true
 	 * @param tag
 	 * @param msg
 	 */
@@ -25,6 +31,12 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * 使用默认tag（ {@link #LOG_TAG "Log.debug"}） 输出debug 级别log
+	 * <br/>
+	 * 需要 BuildConfig.DEBUG = true
+	 * @param msg
+	 */
 	public static void logDebug(String msg) {
 		if(BuildConfig.DEBUG){
 			Log.d(LOG_TAG,msg);
@@ -32,25 +44,19 @@ public class Utils {
 	}
 	
 	
-	/**
-	 * 简单处理下XMPP的异常信息
-	 * @param e
-	 * @return
+	/** 选取文件 
+	 * @param context Activity obj
+	 * @param FILE_SELECT_CODE 请求码
 	 */
-	public static String resloveLoginException(Exception e){
-		if(e instanceof XMPPException){
-			if(e instanceof XMPPErrorException){
-				XMPPErrorException erp = (XMPPErrorException) e;
-				XMPPError.Type type = erp.getXMPPError().getType();
-			}
-			if(e instanceof SASLErrorException){
-				return "登录失败：用户名或密码错误";
-			}
-		}else if(e instanceof SmackException){
-			if(e instanceof ConnectionException){
-				return "登录失败：无法连接到服务器";
-			}
-		}
-		return "未知错误";
+	public static void showFileChooser(Activity context,int FILE_SELECT_CODE) {
+	    Intent intent = new Intent(Intent.ACTION_GET_CONTENT); 
+	    intent.setType("*/*"); 
+	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+	 
+	    try {
+	    	context.startActivityForResult( Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+	    } catch (android.content.ActivityNotFoundException ex) {
+	        Toast.makeText(context, "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
+	    }
 	}
 }
