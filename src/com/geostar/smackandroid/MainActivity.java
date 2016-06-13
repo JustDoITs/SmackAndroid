@@ -19,8 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.geostar.smackandroid.base.BasePresenter;
-import com.geostar.smackandroid.chat.ChatFragment;
-import com.geostar.smackandroid.chat.ChatPresenter;
+import com.geostar.smackandroid.chat.ChatRecordFragment;
+import com.geostar.smackandroid.chat.ChatRecordPresenter;
 import com.geostar.smackandroid.contacts.RosterFragment;
 import com.geostar.smackandroid.contacts.RosterPresenter;
 import com.geostar.smackandroid.pubsub.PubSubFragment;
@@ -67,9 +67,9 @@ public class MainActivity extends FragmentActivity {
 			BasePresenter contactPresenter = new RosterPresenter(mXmppService.getXMPPConnection(), frag);
 //			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
 			
-			ChatFragment cfrag = (ChatFragment)mSectionsPagerAdapter.getItem(PAGE_CHAT);
+			ChatRecordFragment cfrag = (ChatRecordFragment)mSectionsPagerAdapter.getItem(PAGE_CHAT);
 			frag.setChatMsgSubject(mXmppService);
-			ChatPresenter chatPresenter = new ChatPresenter(mXmppService.getXMPPConnection(), cfrag);
+			ChatRecordPresenter chatPresenter = new ChatRecordPresenter(mXmppService.getXMPPConnection(), cfrag);
 			
 			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(PAGE_PUBSUB);
 			BasePresenter pubSubPresenter = new PubSubPresenter(mXmppService.getXMPPConnection(), pf);
@@ -192,7 +192,7 @@ public class MainActivity extends FragmentActivity {
 			frag = new RosterFragment();
 			break;
 		case 1:
-			frag = new ChatFragment();
+			frag = new ChatRecordFragment();
 			break;
 		case 2:
 			frag = new PubSubFragment();

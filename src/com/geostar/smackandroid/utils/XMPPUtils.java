@@ -4,9 +4,13 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.ConnectionException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.sasl.SASLErrorException;
 
+import com.geostar.smackandroid.message.data.dao.ChatMessage;
+
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class XMPPUtils {
@@ -32,6 +36,26 @@ public class XMPPUtils {
 			}
 		}
 		return "未知错误";
+	}
+	
+	
+	/** jid 用户名不能有@ */
+	public static final String getBareJid(@NonNull String jid){
+		return jid.split("@")[0];
+	}
+
+
+	public static ChatMessage toChatMessage(@NonNull Message msg) {
+		ChatMessage local = new ChatMessage();
+		local.setBody(msg.getBody());
+		local.setFrom(msg.getFrom());
+		local.setIsRead(false);
+		local.setSubject(msg.getSubject());
+		local.setThread(msg.getThread());
+		local.setTime(System.currentTimeMillis());
+		local.setTo(msg.getTo());
+		local.setType(msg.getType().toString());
+		return local;
 	}
 	
 }

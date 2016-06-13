@@ -29,8 +29,8 @@ import android.widget.TextView;
 
 import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.chat.ChatActivity;
 import com.geostar.smackandroid.contacts.RosterContract.Presenter;
+import com.geostar.smackandroid.message.ChatActivity;
 import com.geostar.smackandroid.service.IChatMsgObserver;
 import com.geostar.smackandroid.service.IChatMsgSubject;
 

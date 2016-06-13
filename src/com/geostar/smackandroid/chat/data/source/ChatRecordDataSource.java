@@ -16,5 +16,7 @@ public interface ChatRecordDataSource extends BaseDataSource{
 	
 	void updateChatRecord(ChatRecord upRecord);
 	
+	ChatRecord queryChatRecordByIdentify(String identify);
 	
+	ChatRecord queryChatRecordByChatTo(String who);
 }

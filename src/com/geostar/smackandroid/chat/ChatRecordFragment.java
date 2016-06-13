@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 
 import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.chat.ChatContract.Presenter;
+import com.geostar.smackandroid.chat.ChatRecordContract.Presenter;
 
-public class ChatFragment extends BaseFragment implements OnRefreshListener,ChatContract.View {
+public class ChatRecordFragment extends BaseFragment implements OnRefreshListener,ChatRecordContract.View {
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	

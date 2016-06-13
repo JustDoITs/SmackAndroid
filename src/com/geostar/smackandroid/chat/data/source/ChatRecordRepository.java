@@ -60,4 +60,18 @@ public class ChatRecordRepository implements ChatRecordDataSource{
 	public void updateChatRecord(ChatRecord upRecord) {
 		mLocalDataSource.updateChatRecord(upRecord);
 	}
+
+
+	@Override
+	public ChatRecord queryChatRecordByIdentify(String identify) {
+		// TODO Auto-generated method stub
+		return mLocalDataSource.queryChatRecordByIdentify(identify);
+	}
+
+
+	@Override
+	public ChatRecord queryChatRecordByChatTo(String who) {
+		// TODO Auto-generated method stub
+		return mLocalDataSource.queryChatRecordByChatTo(who);
+	}
 }

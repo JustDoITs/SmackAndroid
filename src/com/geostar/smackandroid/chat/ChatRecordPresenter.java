@@ -17,18 +17,18 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import com.geostar.smackandroid.utils.Utils;
 
 
-public class ChatPresenter implements ChatContract.Presenter, FileTransferListener{
+public class ChatRecordPresenter implements ChatRecordContract.Presenter, FileTransferListener{
 
 	private Roster mRoster;
 	
 	private AbstractXMPPConnection mConnection;
 	
-	private ChatContract.View mView;
+	private ChatRecordContract.View mView;
 	
 	private FileTransferManager mFileTransManager;
 
 	
-	public ChatPresenter(AbstractXMPPConnection conn, ChatContract.View view) {
+	public ChatRecordPresenter(AbstractXMPPConnection conn, ChatRecordContract.View view) {
 		super();
 		this.mConnection = conn;
 		this.mView = view;

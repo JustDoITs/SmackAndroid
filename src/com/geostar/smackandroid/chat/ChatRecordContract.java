@@ -3,7 +3,7 @@ package com.geostar.smackandroid.chat;
 import com.geostar.smackandroid.base.BasePresenter;
 import com.geostar.smackandroid.base.BaseView;
 
-public interface ChatContract {
+public interface ChatRecordContract {
 
 	interface View extends BaseView<Presenter> {
 

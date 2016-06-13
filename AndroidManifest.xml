@@ -36,7 +36,7 @@
             android:launchMode="singleTop" >
         </activity>
         <activity
-            android:name="com.geostar.smackandroid.chat.ChatActivity"
+            android:name="com.geostar.smackandroid.message.ChatActivity"
             android:label="@string/title_activity_chat" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->

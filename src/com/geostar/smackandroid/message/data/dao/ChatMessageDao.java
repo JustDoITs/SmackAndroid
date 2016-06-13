@@ -25,11 +25,12 @@ public class ChatMessageDao extends AbstractDao<ChatMessage, Long> {
         public final static Property To = new Property(2, String.class, "to", false, "to");
         public final static Property Time = new Property(3, Long.class, "time", false, "time");
         public final static Property Type = new Property(4, String.class, "type", false, "type");
-        public final static Property Subject = new Property(5, String.class, "subject", false, "subject");
-        public final static Property Body = new Property(6, String.class, "body", false, "body");
-        public final static Property Thread = new Property(7, String.class, "thread", false, "thread");
-        public final static Property ExtentedContent = new Property(8, String.class, "extentedContent", false, "extentedContent");
-        public final static Property ServerTime = new Property(9, Long.class, "serverTime", false, "server_time");
+        public final static Property IsRead = new Property(5, Boolean.class, "isRead", false, "is_read");
+        public final static Property Subject = new Property(6, String.class, "subject", false, "subject");
+        public final static Property Body = new Property(7, String.class, "body", false, "body");
+        public final static Property Thread = new Property(8, String.class, "thread", false, "thread");
+        public final static Property ExtentedContent = new Property(9, String.class, "extentedContent", false, "extentedContent");
+        public final static Property ServerTime = new Property(10, Long.class, "serverTime", false, "server_time");
     };
 
 
@@ -50,11 +51,12 @@ public class ChatMessageDao extends AbstractDao<ChatMessage, Long> {
                 "\"to\" TEXT," + // 2: to
                 "\"time\" INTEGER," + // 3: time
                 "\"type\" TEXT," + // 4: type
-                "\"subject\" TEXT," + // 5: subject
-                "\"body\" TEXT," + // 6: body
-                "\"thread\" TEXT," + // 7: thread
-                "\"extentedContent\" TEXT," + // 8: extentedContent
-                "\"server_time\" INTEGER);"); // 9: serverTime
+                "\"is_read\" INTEGER," + // 5: isRead
+                "\"subject\" TEXT," + // 6: subject
+                "\"body\" TEXT," + // 7: body
+                "\"thread\" TEXT," + // 8: thread
+                "\"extentedContent\" TEXT," + // 9: extentedContent
+                "\"server_time\" INTEGER);"); // 10: serverTime
     }
 
     /** Drops the underlying database table. */
@@ -93,29 +95,34 @@ public class ChatMessageDao extends AbstractDao<ChatMessage, Long> {
             stmt.bindString(5, type);
         }
  
+        Boolean isRead = entity.getIsRead();
+        if (isRead != null) {
+            stmt.bindLong(6, isRead ? 1L: 0L);
+        }
+ 
         String subject = entity.getSubject();
         if (subject != null) {
-            stmt.bindString(6, subject);
+            stmt.bindString(7, subject);
         }
  
         String body = entity.getBody();
         if (body != null) {
-            stmt.bindString(7, body);
+            stmt.bindString(8, body);
         }
  
         String thread = entity.getThread();
         if (thread != null) {
-            stmt.bindString(8, thread);
+            stmt.bindString(9, thread);
         }
  
         String extentedContent = entity.getExtentedContent();
         if (extentedContent != null) {
-            stmt.bindString(9, extentedContent);
+            stmt.bindString(10, extentedContent);
         }
  
         Long serverTime = entity.getServerTime();
         if (serverTime != null) {
-            stmt.bindLong(10, serverTime);
+            stmt.bindLong(11, serverTime);
         }
     }
 
@@ -134,11 +141,12 @@ public class ChatMessageDao extends AbstractDao<ChatMessage, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // to
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // time
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // type
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // subject
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // body
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // thread
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // extentedContent
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // serverTime
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // isRead
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // subject
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // body
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // thread
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // extentedContent
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // serverTime
         );
         return entity;
     }
@@ -151,11 +159,12 @@ public class ChatMessageDao extends AbstractDao<ChatMessage, Long> {
         entity.setTo(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setTime(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setType(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setSubject(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setBody(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setThread(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setExtentedContent(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setServerTime(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setIsRead(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setSubject(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBody(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setThread(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setExtentedContent(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setServerTime(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
      }
     
     /** @inheritdoc */
