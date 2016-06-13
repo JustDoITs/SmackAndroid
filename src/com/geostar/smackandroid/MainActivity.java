@@ -269,8 +269,9 @@ public class MainActivity extends FragmentActivity {
 			finish();
 			return true;
 		}
-		if (id == R.id.action_exit) {
-			mXmppService.logout();
+		if (id == R.id.action_exit) { // 退出应用
+			mXmppService.logout();//登出 
+			mXmppService.stopSelf();//停止服务
 			finish();
 			return true;
 		}
