@@ -2,13 +2,15 @@ package com.geostar.smackandroid.message;
 
 import java.util.List;
 
-import android.app.Activity;
-import android.app.ListActivity;
+import android.app.Service;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,7 +24,7 @@ import com.geostar.smackandroid.utils.Utils;
  * @author jianghanghang
  *
  */
-public class ChatActivity extends Activity {
+public class ChatActivity extends FragmentActivity {
 
 	protected static final String TAG = "ChatActivity";
 	
@@ -57,8 +59,12 @@ public class ChatActivity extends Activity {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
 //			registerMessageListener();
-			mChatPresenter = new ChatPresenter(mXmppService.getXMPPConnection(), getChatView());
+			// 服务连接后设置Presenter
+			mChatPresenter = new ChatPresenter(ChatActivity.this,mXmppService.getXMPPConnection(), getChatView());
+			mChatPresenter.openChat(mChatOjb);
 			
+			mXmppService.unregisterChatMessageObserver(mChatFragment);
+			mXmppService.registerChatMessageObserver(mChatFragment);
 		}
 	};
 
@@ -75,30 +81,39 @@ public class ChatActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// 绑定服务
+		bindService(new Intent(this,XMPPService.class),mServiceConnection, Service.BIND_AUTO_CREATE);
+		
+		// 读取参数
+		if(mChatOjb == null){
+			Intent args = getIntent();
+			if(args == null){
+				finish();
+			}
+			
+			mChatOjb = args.getStringExtra(KEY_USER);
+			firstInMsg = args.getStringArrayListExtra(KEY_MSG);
+			
+			if(TextUtils.isEmpty(mChatOjb)){
+				finish();
+			}
+		}
+		
 		setContentView(R.layout.activity_chat);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		mChatFragment = new ChatFragment();
+		// 加入View
+		getSupportFragmentManager().beginTransaction()
+			.add(R.id.fl_fragment_container,mChatFragment).commit();
 		
 		
-//		String inMsg = null;
-//		if(mChatOjb == null){
-//			Intent args = getIntent();
-//			if(args == null){
-//				finish();
-//			}
-//			
-//			mChatOjb = args.getStringExtra(KEY_USER);
-//			firstInMsg = args.getStringArrayListExtra(KEY_MSG);
-//			
-//			if(TextUtils.isEmpty(mChatOjb)){
-//				finish();
-//			}
-//		}
+		
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.chat, menu);
 		return true;
 	}
@@ -122,11 +137,21 @@ public class ChatActivity extends Activity {
 	
 	@Override
 	protected void onResume() {
-		if(getXmppService() != null && getXmppService() !=null 
-				&& !getXmppService().getXMPPConnection().isConnected()){
+		if(getXmppService() != null && !getXmppService().getXMPPConnection().isConnected()){
 			getXmppService().reconnect();
 		}
+		if(getXmppService() != null){
+			// 注册消息观察器
+			mXmppService.unregisterChatMessageObserver(mChatFragment);
+			mXmppService.registerChatMessageObserver(mChatFragment);
+		}
 		super.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		getXmppService().unregisterChatMessageObserver(mChatFragment);
+		super.onPause();
 	}
 	
 	@Override

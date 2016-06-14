@@ -41,8 +41,10 @@ import com.geostar.smackandroid.chat.data.dao.ChatRecord;
 import com.geostar.smackandroid.chat.data.source.ChatRecordDataSource;
 import com.geostar.smackandroid.chat.data.source.ChatRecordRepository;
 import com.geostar.smackandroid.chat.data.source.LocalChatRecordDS;
+import com.geostar.smackandroid.config.Configuration;
 import com.geostar.smackandroid.message.ChatActivity;
 import com.geostar.smackandroid.message.data.source.ChatMessageDataSource;
+import com.geostar.smackandroid.message.data.source.ChatMessageRepository;
 import com.geostar.smackandroid.message.data.source.local.ChatMessageLocalDataSource;
 import com.geostar.smackandroid.utils.Utils;
 import com.geostar.smackandroid.utils.XMPPUtils;
@@ -271,36 +273,32 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     }
 
     protected void saveNewChatMessage(Message msg) {
-		// TODO Auto-generated method stub
-    	File path = this.getDir("data",Context.MODE_PRIVATE);
-    	File msgDir = new File(path,mUsername + File.separator + "msg_record");
-    	if(!msgDir.isDirectory()){
-    		msgDir.mkdirs();
-    	}
-
-    	String chatDbfilePath = null;
+    	// TODO: 
+    	String chatDbDSKey = null;
     	if( msg.getType() == Type.chat ){
-    		chatDbfilePath = XMPPUtils.getBareJid(msg.getFrom()) + ".db";
-    		Utils.logDebug("is a chat getThread msg.getFrom(): " + XMPPUtils.getBareJid(msg.getFrom()) + "; thread: "+ msg.getThread());
+    		chatDbDSKey = XMPPUtils.getJidWithoutRes(msg.getFrom());
+    		Utils.logDebug("is a chat getThread msg.getFrom(): " + chatDbDSKey + "; thread: "+ msg.getThread());
     	}else if( msg.getType() == Type.groupchat ){
-    		chatDbfilePath = msg.getThread() + ".db";
+    		chatDbDSKey = msg.getThread() ;
     		Utils.logDebug("is a multiChat getThread : " + msg.getThread());
     	}
-    	File msgFile = new File(msgDir,chatDbfilePath);
-    	if(!msgFile.isFile()){
-    		try {
-    			msgFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    	
+    	ChatMessageRepository repo = ChatMessageRepository.getInstance();
+    	if( !repo.checkoutDS(chatDbDSKey) ){
+    		File msgFile = new File(Configuration.getUserChatMsgDir(this, mUsername) + File.separator + chatDbDSKey + ".db3");
+        	if(!msgFile.isFile()){
+        		try {
+        			msgFile.createNewFile();
+    			} catch (IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        	}
+        	Utils.logDebug("msgFile:" + msgFile.getAbsolutePath());
+    		ChatMessageDataSource chatDS = new ChatMessageLocalDataSource(this, msgFile.getAbsolutePath());
+    		repo.addChatDataSource(chatDbDSKey, chatDS);
     	}
-    	
-    	
-    	ChatMessageDataSource chatDS = new ChatMessageLocalDataSource(this, msgFile.getAbsolutePath());
-    	chatDS.saveChatMessage(XMPPUtils.toChatMessage(msg));
-    	Utils.logDebug("msgFile:" + msgFile.getAbsolutePath());
-    	
+    	repo.saveChatMessage(XMPPUtils.toChatMessage(msg));
     	
 //    	ChatRecordDataSource mdataSource = new LocalChatRecordDS(this, recordFile.getAbsolutePath());
 //    	Utils.logDebug("File path:" + recordFile.getAbsolutePath());

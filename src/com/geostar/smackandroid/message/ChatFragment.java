@@ -3,6 +3,8 @@ package com.geostar.smackandroid.message;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jivesoftware.smack.packet.Message;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,9 +24,11 @@ import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.message.ChatContract.Presenter;
 import com.geostar.smackandroid.message.data.dao.ChatMessage;
+import com.geostar.smackandroid.service.IChatMsgObserver;
+import com.geostar.smackandroid.service.IChatMsgSubject;
 import com.geostar.smackandroid.utils.Utils;
 
-public class ChatFragment extends BaseFragment implements OnRefreshListener,ChatContract.View {
+public class ChatFragment extends BaseFragment implements OnRefreshListener,ChatContract.View,IChatMsgObserver {
 	
 	private ChatAdapter mAdapter;
 	
@@ -52,7 +56,6 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 		mMsgSendBtn = (Button) v.findViewById(R.id.btn_send_msg);
 		mMsgInput = (EditText) v.findViewById(R.id.et_input_msg);
 		mMsgSendBtn.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				sendMessage();
@@ -61,8 +64,6 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 		
 		mFileChooseBtn = (ImageButton) v.findViewById(R.id.ib_chat_send_more);
 		mFileChooseBtn.setOnClickListener(new OnClickListener() {
-			
-
 			@Override
 			public void onClick(View view) {
 				Utils.showFileChooser(getActivity(), FILE_SELECT_CODE);
@@ -79,8 +80,9 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		
-//		getActionBar().setDisplayHomeAsUpEnabled(true);
-//		getActionBar().setTitle(mChatOjb.split("@")[0]);
+		if(mChatOjb != null){
+			getActivity().setTitle(mChatOjb.split("@")[0]);
+		}
 		
 		initListView();
 		
@@ -89,6 +91,13 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 
 	/** 刷新List */
 	protected void initListView() {
+		if(mPresenter == null){
+			Utils.logDebug("Connect is not ready!!!");
+			return;
+		}else{
+			Utils.logDebug("mPresent is ok...");
+		}
+		mMsgLists = mPresenter.getAllMessages();
 		mAdapter = new ChatAdapter(getActivity(), mMsgLists);
 //		if(firstInMsg != null){
 //			for(String msgContent : firstInMsg){
@@ -97,53 +106,7 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 //		}
 		getListView().setAdapter(mAdapter);
 	}
-	
-//	private void registerMessageListener() {
-//		// TODO Auto-generated method stub
-//		StanzaListener Messagelistener = new StanzaListener() {
-//            
-//        };
-//        mXmppService.getXMPPConnection().addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
-//	}
-	
-	/** 
-	 * 发送消息
-	 */
-	protected void sendMessage() {
-		
-		
-		// TODO Auto-generated method stub
-//		if(getXmppService() != null && getXmppService().getXMPPConnection() != null ){
-//		}else{
-//			Toast.makeText(this, "您已离线，请重新登录后发送", Toast.LENGTH_SHORT).show();
-//			return;
-//		}
-//		String msg = mMsgInput.getText().toString();
-//		if(TextUtils.isEmpty(msg)){
-//			Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT).show();
-//			return;
-//		}
 
-//		Message sendMsg = new Message();
-//		sendMsg.setBody(msg);
-//		mMsgLists.add(sendMsg);
-//		mAdapter.notifyDataSetChanged();
-//		getListView().setSelection(mMsgLists.size()-1);
-//		
-//		// 发送消息
-//		ChatManager chatManager = ChatManager.getInstanceFor(getXmppService().getXMPPConnection());
-//	
-//		Chat newChat  =	chatManager.createChat(mChatOjb);
-////		getXmppService().addChatThread(newChat);// nouse
-//		try {
-//			newChat.sendMessage(sendMsg);
-//		} catch (NotConnectedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		mMsgInput.setText("");
-		
-	}
 	
 	private void receiverANewMessage(ChatMessage msg) {
 		if(getListView().getAdapter() == null){
@@ -156,6 +119,7 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 	
 	@Override
 	public void onRefresh() {
+		initListView();
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
 
@@ -222,14 +186,14 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 				holder = (ViewHolder) convertView.getTag();
 			}
 			ChatMessage msg = getItem(position);
-			if(msg.getTo().contains(mChatOjb)){// 自己发出的消息
-				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.VISIBLE);
-				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.GONE);
-				holder.msgMine.setText(msg.getBody());
-			}else{
+			if(msg.getTo().contains(mPresenter.getCurrentUser())){
 				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.GONE);
 				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.VISIBLE);
 				holder.msgOther.setText(msg.getBody());
+			}else{// 自己发出的消息
+				convertView.findViewById(R.id.chat_msg_mine).setVisibility(View.VISIBLE);
+				convertView.findViewById(R.id.chat_msg_others).setVisibility(View.GONE);
+				holder.msgMine.setText(msg.getBody());
 			}
 			return convertView;
 		}
@@ -250,8 +214,75 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,Chat
 	}
 
 
+	
+//	private void registerMessageListener() {
+//		// TODO Auto-generated method stub
+//		StanzaListener Messagelistener = new StanzaListener() {
+//            
+//        };
+//        mXmppService.getXMPPConnection().addAsyncStanzaListener(Messagelistener, MessageWithBodiesFilter.INSTANCE);
+//	}
+	
+	/** 
+	 * 发送消息
+	 */
+	protected void sendMessage() {
+		
+		// TODO Auto-generated method stub
+//		if(getXmppService() != null && getXmppService().getXMPPConnection() != null ){
+//		}else{
+//			Toast.makeText(this, "您已离线，请重新登录后发送", Toast.LENGTH_SHORT).show();
+//			return;
+//		}
+//		String msg = mMsgInput.getText().toString();
+//		if(TextUtils.isEmpty(msg)){
+//			Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT).show();
+//			return;
+//		}
+
+//		Message sendMsg = new Message();
+//		sendMsg.setBody(msg);
+//		mMsgLists.add(sendMsg);
+//		mAdapter.notifyDataSetChanged();
+//		getListView().setSelection(mMsgLists.size()-1);
+//		
+//		// 发送消息
+//		ChatManager chatManager = ChatManager.getInstanceFor(getXmppService().getXMPPConnection());
+//	
+//		Chat newChat  =	chatManager.createChat(mChatOjb);
+////		getXmppService().addChatThread(newChat);// nouse
+//		try {
+//			newChat.sendMessage(sendMsg);
+//		} catch (NotConnectedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		mMsgInput.setText("");
+		
+	}
+	
+	
 	@Override
 	public void updateChatList(List<ChatMessage> msgs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	
+	
+	
+	@Override
+	public void update(List<Message> msgs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
 		// TODO Auto-generated method stub
 		
 	}

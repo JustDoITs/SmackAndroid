@@ -8,6 +8,10 @@ public interface IChatMsgObserver {
 	
 	void update(List<Message> msgs);
 	
+	/**
+	 * 设置观察主题
+	 * @param chatMsgSubject
+	 */
 	void setChatMsgSubject(IChatMsgSubject chatMsgSubject);
 	
 }

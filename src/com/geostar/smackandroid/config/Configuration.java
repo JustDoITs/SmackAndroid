@@ -6,6 +6,12 @@ import android.content.Context;
 
 public class Configuration {
 
+	/**
+	 * 用户数据保存目录
+	 * @param context
+	 * @param userName
+	 * @return
+	 */
 	public static String getUserDataHome(Context context, String userName){
 		File path = context.getDir("data",Context.MODE_PRIVATE);
     	File msgDir = new File(path,userName);
@@ -15,7 +21,12 @@ public class Configuration {
 		return msgDir.getAbsolutePath();
 	}
 	
-	
+	/**
+	 * 用户聊天记录保存目录
+	 * @param context
+	 * @param userName
+	 * @return
+	 */
 	public static String getUserChatMsgDir(Context context, String userName){
 		String filePath = getUserDataHome(context,userName) + File.separator + "msg_record";
 		File f = new File(filePath);

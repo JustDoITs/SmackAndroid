@@ -23,7 +23,7 @@ public class ChatMessageLocalDataSource implements ChatMessageDataSource {
 		super();
 		this.mDataSourcePath = dataSourcePath;
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(dataSourcePath, null, SQLiteDatabase.CREATE_IF_NECESSARY);
-		DaoMaster.createAllTables(db, false);
+		DaoMaster.createAllTables(db, true);
 		mChatDao = new DaoMaster(db).newSession().getChatMessageDao();
 	}
 

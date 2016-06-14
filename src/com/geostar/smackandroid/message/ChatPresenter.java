@@ -2,33 +2,47 @@ package com.geostar.smackandroid.message;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import com.geostar.smackandroid.config.Configuration;
+import com.geostar.smackandroid.message.data.dao.ChatMessage;
+import com.geostar.smackandroid.message.data.source.ChatMessageDataSource;
+import com.geostar.smackandroid.message.data.source.ChatMessageRepository;
+import com.geostar.smackandroid.message.data.source.local.ChatMessageLocalDataSource;
 import com.geostar.smackandroid.utils.Utils;
+import com.geostar.smackandroid.utils.XMPPUtils;
 
 
 public class ChatPresenter implements ChatContract.Presenter, FileTransferListener,StanzaListener{
 
-	private Roster mRoster;
 	
 	private AbstractXMPPConnection mConnection;
 	
 	private ChatContract.View mView;
 	
 	private FileTransferManager mFileTransManager;
+	
+	/** 不带resource  */
+	private String mCurrentUser;
+	
+	private Context mContext;
 
 	
-	public ChatPresenter(AbstractXMPPConnection conn, ChatContract.View view) {
+	public ChatPresenter(@NonNull Context context,@NonNull AbstractXMPPConnection conn,@NonNull ChatContract.View view) {
 		super();
+		this.mContext = context;
 		this.mConnection = conn;
 		this.mView = view;
 		view.setPresenter(this);
@@ -39,6 +53,7 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 				mFileTransManager.addFileTransferListener(this);
 			}
 			mConnection.removeAsyncStanzaListener(this);
+			mCurrentUser = XMPPUtils.getJidWithoutRes(mConnection.getUser());
 		}else{
 			System.out.println("------ ERROR: connnect not connected!!!");
 		}
@@ -98,6 +113,35 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 		if(mConnection != null){
 			mConnection.removeAsyncStanzaListener(this);
 		}
+	}
+
+	@Override
+	public void openChat(String chatObj) {
+    	String chatDbDSKey = XMPPUtils.getJidWithoutRes(chatObj);
+    	ChatMessageRepository repo = ChatMessageRepository.getInstance();
+    	if( !repo.checkoutDS(chatDbDSKey) ){
+    		File msgFile = new File(Configuration.getUserChatMsgDir(mContext, mCurrentUser) + File.separator + chatDbDSKey + ".db3");
+        	if(!msgFile.isFile()){
+        		try {
+        			msgFile.createNewFile();
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    			}
+        	}
+        	Utils.logDebug("openChat - msgFile:" + msgFile.getAbsolutePath());
+    		ChatMessageDataSource chatDS = new ChatMessageLocalDataSource(mContext, msgFile.getAbsolutePath());
+    		repo.addChatDataSource(chatDbDSKey, chatDS);
+    	}
+	}
+
+	@Override
+	public List<ChatMessage> getAllMessages() {
+		return ChatMessageRepository.getInstance().getAllMessages();
+	}
+
+	@Override
+	public String getCurrentUser() {
+		return mCurrentUser;
 	}
 
 

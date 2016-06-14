@@ -39,12 +39,24 @@ public class XMPPUtils {
 	}
 	
 	
-	/** jid 用户名不能有@ */
-	public static final String getBareJid(@NonNull String jid){
+	/** 获取用户名 
+	 *  注：jid 用户名不能有@ */
+	private static final String getBareJid(@NonNull String jid){
 		return jid.split("@")[0];
 	}
+	
+	/** 获取截去资源部分的用户名 如  admin@192.168.0.1
+	 *  注：jid 用户名不能有@ */
+	public static final String getJidWithoutRes(@NonNull String jid){
+		return jid.split("/")[0];
+	}
 
-
+	// TODO: 消息类型处理 
+	/**
+	 * 
+	 * @param msg
+	 * @return
+	 */
 	public static ChatMessage toChatMessage(@NonNull Message msg) {
 		ChatMessage local = new ChatMessage();
 		local.setBody(msg.getBody());

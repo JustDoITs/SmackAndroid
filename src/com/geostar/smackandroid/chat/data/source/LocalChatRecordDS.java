@@ -73,7 +73,7 @@ public class LocalChatRecordDS implements ChatRecordDataSource {
 		if(results.size() > 0){
 			return results.get(0);
 		}else{
-			results = mChatRecordDao.queryBuilder().where(Properties.Identify.eq(XMPPUtils.getBareJid(who))).list();
+			results = mChatRecordDao.queryBuilder().where(Properties.Identify.eq(XMPPUtils.getJidWithoutRes(who))).list();
 			return results.size() > 0?results.get(0):null;
 		}
 	}

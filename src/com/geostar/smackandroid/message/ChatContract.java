@@ -19,10 +19,29 @@ public interface ChatContract {
 
 	interface Presenter extends BasePresenter {
 		
+		/**
+		 * 设置聊天对象,用以确定数据源
+		 * @param chatObj
+		 */
+		void openChat(String chatObj);
+		
+		/**当前用户 jid */
+		String getCurrentUser();
+		
+		/**
+		 * 获取当前同当前聊天对象的所有的消息
+		 * @return 
+		 */
+		List<ChatMessage> getAllMessages();
+		
+		
 		void sendFile(String filePath);
 		
 		void sendMessage(String msg);
 		
+		/**
+		 * 做一些销毁工作，如关闭数据源
+		 */
 		void destory();
 		
 	}
