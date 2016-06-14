@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.geostar.smackandroid.base.BaseFragment;
 import com.geostar.smackandroid.base.BasePresenter;
 import com.geostar.smackandroid.chat.ChatRecordFragment;
 import com.geostar.smackandroid.chat.ChatRecordPresenter;

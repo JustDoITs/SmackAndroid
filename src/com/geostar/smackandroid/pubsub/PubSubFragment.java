@@ -41,8 +41,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.base.BaseFragment;
 import com.geostar.smackandroid.pubsub.PubSubContract.Presenter;
 import com.geostar.smackandroid.pubsub.mock.ViewSubMsgActivity;
 

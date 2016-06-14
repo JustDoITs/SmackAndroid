@@ -37,12 +37,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 
 import com.geostar.smackandroid.R;
-import com.geostar.smackandroid.chat.data.dao.ChatRecord;
-import com.geostar.smackandroid.chat.data.source.ChatRecordDataSource;
-import com.geostar.smackandroid.chat.data.source.ChatRecordRepository;
-import com.geostar.smackandroid.chat.data.source.LocalChatRecordDS;
 import com.geostar.smackandroid.config.Configuration;
 import com.geostar.smackandroid.message.ChatActivity;
+import com.geostar.smackandroid.message.data.dao.ChatMessage;
 import com.geostar.smackandroid.message.data.source.ChatMessageDataSource;
 import com.geostar.smackandroid.message.data.source.ChatMessageRepository;
 import com.geostar.smackandroid.message.data.source.local.ChatMessageLocalDataSource;
@@ -80,7 +77,7 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     private Chat mCurChat;
     
     /** 未通知的聊天消息 */
-    private List<Message> mNewUnReadMessages = new ArrayList<Message>();
+    private List<ChatMessage> mNewUnReadMessages = new ArrayList<ChatMessage>();
     
     
     @Override
@@ -256,13 +253,14 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
                 if(packet instanceof org.jivesoftware.smack.packet.Message){
                     org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
+                    ChatMessage chatmsg = XMPPUtils.toChatMessage(msg);
                     Utils.logDebug(TAG,"接收到一条消息: " +  msg.getBody());
                     /* ----------	 当接收到带有body的 聊天消息时的处理逻辑 ；
                      * 			    	 此时可能应用不在前台  -------- */
-                    if(!mNewUnReadMessages.contains(msg)){
-                    	mNewUnReadMessages.add(msg);
+                    if(!mNewUnReadMessages.contains(chatmsg)){
+                    	mNewUnReadMessages.add(chatmsg);
                     }
-                    saveNewChatMessage(msg);
+                    saveNewChatMessage(chatmsg);
                     notifyNewChatMessage();
                     /* -------------- -------------------- */
                 }
@@ -272,13 +270,13 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
         mXmppConnection.addAsyncStanzaListener(messagelistener, MessageWithBodiesFilter.INSTANCE);
     }
 
-    protected void saveNewChatMessage(Message msg) {
+    protected void saveNewChatMessage(ChatMessage msg) {
     	// TODO: 
     	String chatDbDSKey = null;
-    	if( msg.getType() == Type.chat ){
+    	if( msg.getType().equals(Type.chat.toString()) ){
     		chatDbDSKey = XMPPUtils.getJidWithoutRes(msg.getFrom());
     		Utils.logDebug("is a chat getThread msg.getFrom(): " + chatDbDSKey + "; thread: "+ msg.getThread());
-    	}else if( msg.getType() == Type.groupchat ){
+    	}else if( msg.getType().equals(Type.groupchat.toString()) ){
     		chatDbDSKey = msg.getThread() ;
     		Utils.logDebug("is a multiChat getThread : " + msg.getThread());
     	}
@@ -298,8 +296,8 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     		ChatMessageDataSource chatDS = new ChatMessageLocalDataSource(this, msgFile.getAbsolutePath());
     		repo.addChatDataSource(chatDbDSKey, chatDS);
     	}
-    	repo.saveChatMessage(XMPPUtils.toChatMessage(msg));
-    	
+    	repo.saveChatMessage(msg);
+    	//XMPPUtils.toChatMessage(
 //    	ChatRecordDataSource mdataSource = new LocalChatRecordDS(this, recordFile.getAbsolutePath());
 //    	Utils.logDebug("File path:" + recordFile.getAbsolutePath());
 //    	ChatRecordRepository repo = ChatRecordRepository.getInstance(mdataSource);
@@ -311,8 +309,8 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	}
 
 	/**发送通知栏通知  */
-    private void sendMsgNotification(List<org.jivesoftware.smack.packet.Message> msges) {
-    	Message msg = msges.get(0);
+    private void sendMsgNotification(List<ChatMessage> msges) {
+    	ChatMessage msg = msges.get(0);
     	
     	NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
     	        .setSmallIcon(R.drawable.ic_launcher)
@@ -325,7 +323,7 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     	// 仅放置最新一条消息
     	resultIntent.putExtra(ChatActivity.KEY_USER, msg.getFrom());
     	ArrayList<String> strMessages = new ArrayList<>();
-    	for(Message m : msges){
+    	for(ChatMessage m : msges){
     		strMessages.add(m.getBody());
     	}
     	resultIntent.putExtra(ChatActivity.KEY_MSG, strMessages);
@@ -383,7 +381,7 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	}
 
 	@Override
-	public void update(List<Message> msgs) {
+	public void update(List<ChatMessage> msgs) {
 		sendMsgNotification(msgs);
 	}
 

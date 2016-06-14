@@ -63,8 +63,8 @@ public class ChatActivity extends FragmentActivity {
 			mChatPresenter = new ChatPresenter(ChatActivity.this,mXmppService.getXMPPConnection(), getChatView());
 			mChatPresenter.openChat(mChatOjb);
 			
-			mXmppService.unregisterChatMessageObserver(mChatFragment);
-			mXmppService.registerChatMessageObserver(mChatFragment);
+			mXmppService.unregisterChatMessageObserver(mChatPresenter);
+			mXmppService.registerChatMessageObserver(mChatPresenter);
 		}
 	};
 
@@ -142,15 +142,15 @@ public class ChatActivity extends FragmentActivity {
 		}
 		if(getXmppService() != null){
 			// 注册消息观察器
-			mXmppService.unregisterChatMessageObserver(mChatFragment);
-			mXmppService.registerChatMessageObserver(mChatFragment);
+			mXmppService.unregisterChatMessageObserver(mChatPresenter);
+			mXmppService.registerChatMessageObserver(mChatPresenter);
 		}
 		super.onResume();
 	}
 	
 	@Override
 	protected void onPause() {
-		getXmppService().unregisterChatMessageObserver(mChatFragment);
+		getXmppService().unregisterChatMessageObserver(mChatPresenter);
 		super.onPause();
 	}
 	

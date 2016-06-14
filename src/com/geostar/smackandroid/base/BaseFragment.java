@@ -1,4 +1,4 @@
-package com.geostar.smackandroid;
+package com.geostar.smackandroid.base;
 
 import android.support.v4.app.ListFragment;
 

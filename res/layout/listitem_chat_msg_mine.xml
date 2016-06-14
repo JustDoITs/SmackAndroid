@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
-    android:id="@+id/chat_msg_mine">
+    android:id="@+id/chat_msg_mine"
+    android:layout_marginLeft="40dp">
     
     <ImageView 
         android:id="@+id/iv_icon"
@@ -17,11 +18,19 @@
         />
     
     <TextView android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:id="@+id/tv_msg_content"
         android:textSize="16dp"
         android:layout_centerVertical="true"
         android:text="这是一条消息"
-        android:gravity="right"
+        android:gravity="right|center_vertical"
+        android:paddingRight="24dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="#fff"
+        android:background="@drawable/chat_pop_mine"
+        android:focusable="true"
+        android:editable="true"
         android:layout_toLeftOf="@+id/iv_icon"/>
 </RelativeLayout>

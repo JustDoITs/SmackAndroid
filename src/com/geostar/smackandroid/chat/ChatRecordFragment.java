@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.base.BaseFragment;
 import com.geostar.smackandroid.chat.ChatRecordContract.Presenter;
 
 public class ChatRecordFragment extends BaseFragment implements OnRefreshListener,ChatRecordContract.View {

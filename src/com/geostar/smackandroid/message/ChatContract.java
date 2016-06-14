@@ -12,15 +12,20 @@ public interface ChatContract {
 
 		String chooseFile();
 //		void updataContactPresenceState(String who,Presence presence);
-
-		void updateChatList(List<ChatMessage> msgs);
+//		void updateChatList(List<ChatMessage> msgs);
+		
+		/** 有新消息来了  */
+		void postNewMessageFromNoneUiThread(List<ChatMessage> newMsgs);
+		
+		void postNewMessage(List<ChatMessage> newMsgs);
 		
 	}
 
 	interface Presenter extends BasePresenter {
 		
 		/**
-		 * 设置聊天对象,用以确定数据源
+		 * 开启同某人的会话
+		 * <br/> 设置聊天对象,设置聊天记录数据源
 		 * @param chatObj
 		 */
 		void openChat(String chatObj);
@@ -38,6 +43,7 @@ public interface ChatContract {
 		void sendFile(String filePath);
 		
 		void sendMessage(String msg);
+		
 		
 		/**
 		 * 做一些销毁工作，如关闭数据源

@@ -26,10 +26,11 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
 
-import com.geostar.smackandroid.BaseFragment;
 import com.geostar.smackandroid.R;
+import com.geostar.smackandroid.base.BaseFragment;
 import com.geostar.smackandroid.contacts.RosterContract.Presenter;
 import com.geostar.smackandroid.message.ChatActivity;
+import com.geostar.smackandroid.message.data.dao.ChatMessage;
 import com.geostar.smackandroid.service.IChatMsgObserver;
 import com.geostar.smackandroid.service.IChatMsgSubject;
 
@@ -44,7 +45,7 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	private List<RosterGroup> mRostersData = new ArrayList<RosterGroup>();
 	private ContactAdapter mAdapter;
 	
-	private Map<String,List<Message>> mUnReadMessages = new ArrayMap<String, List<Message>>();
+	private Map<String,List<ChatMessage>> mUnReadMessages = new ArrayMap<String, List<ChatMessage>>();
 	
 	private IChatMsgSubject mChatMsgSubject;
 
@@ -214,11 +215,11 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
 	
-	private void goToChatActivity(RosterEntry touser,List<Message> msgs) {
+	private void goToChatActivity(RosterEntry touser,List<ChatMessage> msgs) {
 		ArrayList<String> strMessages = null;
 		if(msgs != null){
 			strMessages = new ArrayList<String>();
-			for(Message msg: msgs){
+			for(ChatMessage msg: msgs){
 				strMessages.add(msg.getBody());
 			}
 		}
@@ -285,13 +286,13 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	 * 接收到新的消息
 	 */
 	@Override
-	public void update(List<Message> msgs) {
-		for(Message msg: msgs){
+	public void update(List<ChatMessage> msgs) {
+		for(ChatMessage msg: msgs){
 			String username = msg.getFrom().split("@")[0];
 			if(mUnReadMessages.containsKey(username) ){
 				mUnReadMessages.get(username).add(msg);
 			}else{
-				List<Message> msgList = new ArrayList<Message>();
+				List<ChatMessage> msgList = new ArrayList<ChatMessage>();
 				msgList.add(msg);
 				mUnReadMessages.put(username, msgList);
 			}

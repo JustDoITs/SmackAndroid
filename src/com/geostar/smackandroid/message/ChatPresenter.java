@@ -2,11 +2,16 @@ package com.geostar.smackandroid.message;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -21,11 +26,13 @@ import com.geostar.smackandroid.message.data.dao.ChatMessage;
 import com.geostar.smackandroid.message.data.source.ChatMessageDataSource;
 import com.geostar.smackandroid.message.data.source.ChatMessageRepository;
 import com.geostar.smackandroid.message.data.source.local.ChatMessageLocalDataSource;
+import com.geostar.smackandroid.service.IChatMsgObserver;
+import com.geostar.smackandroid.service.IChatMsgSubject;
 import com.geostar.smackandroid.utils.Utils;
 import com.geostar.smackandroid.utils.XMPPUtils;
 
 
-public class ChatPresenter implements ChatContract.Presenter, FileTransferListener,StanzaListener{
+public class ChatPresenter implements ChatContract.Presenter, FileTransferListener,StanzaListener,IChatMsgObserver{
 
 	
 	private AbstractXMPPConnection mConnection;
@@ -35,7 +42,7 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 	private FileTransferManager mFileTransManager;
 	
 	/** 不带resource  */
-	private String mCurrentUser;
+	private String mCurrentUser,mTo;
 	
 	private Context mContext;
 
@@ -89,14 +96,45 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 	
 	@Override
 	public void sendMessage(String msg) {
-		// TODO Auto-generated method stub
+		// 发送消息
+		ChatManager chatManager = ChatManager.getInstanceFor(mConnection);
+		Chat newChat  =	chatManager.createChat(mTo);
+		try {
+			newChat.sendMessage(msg);
+		} catch (NotConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		openChat(mTo);
+		// 存储消息
+		ChatMessage chatmsg = new ChatMessage();
+		chatmsg.setFrom(mCurrentUser);
+		chatmsg.setTo(mTo);
+		chatmsg.setBody(msg);
+		chatmsg.setTime(System.currentTimeMillis());
+		chatmsg.setType(Type.chat.toString());
+		chatmsg.setThread(newChat.getThreadID());
+		
+		boolean isDataSourceAvailable = ChatMessageRepository.getInstance().checkoutDS(XMPPUtils.getJidWithoutRes(mTo) );
+		if(isDataSourceAvailable ){
+			// 保存消息
+			ChatMessageRepository.getInstance().saveChatMessage(chatmsg);
+			// 更新UI
+			List<ChatMessage> msgs = new ArrayList<ChatMessage>();
+			msgs.add(chatmsg);
+			mView.postNewMessage(msgs);
+		}else{
+			Utils.logDebug("====== ERROR: datasource is not available");
+		}
+
 	}
 	
 	@Override
     public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
         if(packet instanceof org.jivesoftware.smack.packet.Message){
             final org.jivesoftware.smack.packet.Message msg = ((org.jivesoftware.smack.packet.Message)packet);
+            
 //            Log.d(TAG,"Recv a message - MessageWithBodiesFilter : " +  msg.getBody());
 //            getListView().post(new Runnable() {
 //				
@@ -115,8 +153,10 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 		}
 	}
 
+	
 	@Override
 	public void openChat(String chatObj) {
+		mTo = chatObj;
     	String chatDbDSKey = XMPPUtils.getJidWithoutRes(chatObj);
     	ChatMessageRepository repo = ChatMessageRepository.getInstance();
     	if( !repo.checkoutDS(chatDbDSKey) ){
@@ -133,7 +173,10 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
     		repo.addChatDataSource(chatDbDSKey, chatDS);
     	}
 	}
-
+	
+	/**
+	 * TODO:  分页显示
+	 * */
 	@Override
 	public List<ChatMessage> getAllMessages() {
 		return ChatMessageRepository.getInstance().getAllMessages();
@@ -142,6 +185,21 @@ public class ChatPresenter implements ChatContract.Presenter, FileTransferListen
 	@Override
 	public String getCurrentUser() {
 		return mCurrentUser;
+	}
+	
+
+	@Override
+	public void update(List<ChatMessage> msgs) {
+		// TODO Auto-generated method stub
+		Utils.logDebug("聊天Activity 收到新消息：" + msgs.size() );
+		mView.postNewMessageFromNoneUiThread(msgs);
+	}
+
+	
+	@Override
+	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -25,6 +25,7 @@
                 android:layout_height="match_parent"
                 android:divider="@null"
                 android:paddingLeft="8dp"
+		        android:clickable="false"
                 android:paddingRight="8dp" />
         </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
