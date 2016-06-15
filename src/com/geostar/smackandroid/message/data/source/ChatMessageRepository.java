@@ -3,9 +3,6 @@ package com.geostar.smackandroid.message.data.source;
 import java.util.List;
 import java.util.Map;
 
-
-
-
 import android.support.v4.util.ArrayMap;
 
 import com.geostar.smackandroid.message.data.dao.ChatMessage;
@@ -28,7 +25,7 @@ public class ChatMessageRepository implements ChatMessageDataSource {
 	private Map<String,ChatMessageDataSource> mDataSources ;
 	
 	
-	public static ChatMessageRepository getInstance() {
+	public static synchronized ChatMessageRepository getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new ChatMessageRepository();
 		}
@@ -85,7 +82,7 @@ public class ChatMessageRepository implements ChatMessageDataSource {
 	 * @param key
 	 * @return false - 不存在此数据源
 	 */
-	public boolean checkoutDS(String key){
+	public synchronized boolean checkoutDS(String key){
 		mLocalDataSource = mDataSources.get(key);
 		if(mLocalDataSource == null){
 			mCurrentKey = null;

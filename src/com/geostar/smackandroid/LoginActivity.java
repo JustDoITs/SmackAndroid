@@ -17,9 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.geostar.smackandroid.config.Configuration;
 import com.geostar.smackandroid.service.XMPPLoginCallback;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
@@ -31,6 +33,7 @@ public class LoginActivity extends Activity {
 	protected static final String TAG = null;
 	private EditText mUserNameEt,mPasswordEt;
 	private Button mSubmitBtn;
+	private CheckBox mPasswordRemCb;
 	
 	private XMPPService mXmppService;
 	
@@ -40,6 +43,10 @@ public class LoginActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_LOGIN_SUCCESS:
+				if(Configuration.getInstance(LoginActivity.this).isRememberPwdEnable()){
+					Configuration.getInstance(LoginActivity.this).setSavedUserName(mUserNameEt.getText().toString().trim());
+					Configuration.getInstance(LoginActivity.this).setSavedPassword(mPasswordEt.getText().toString().trim());
+				}
 				Toast.makeText(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(LoginActivity.this,MainActivity.class);
 				startActivity(intent);
@@ -93,6 +100,20 @@ public class LoginActivity extends Activity {
 				if(mXmppService != null){
 					loginOrRegister();
 				}
+			}
+		});
+		mPasswordRemCb = (CheckBox) findViewById(R.id.cb_remember_password);
+		boolean remPwd = Configuration.getInstance(LoginActivity.this).isRememberPwdEnable();
+		mPasswordRemCb.setChecked(remPwd);
+		if(remPwd){
+			mUserNameEt.setText(Configuration.getInstance(LoginActivity.this).getSavedUserName());
+			mPasswordEt.setText(Configuration.getInstance(LoginActivity.this).getSavedPassword());
+		}
+		mPasswordRemCb.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Configuration.getInstance(LoginActivity.this).setPasswordRememberEnable(mPasswordRemCb.isChecked());
 			}
 		});
 	}

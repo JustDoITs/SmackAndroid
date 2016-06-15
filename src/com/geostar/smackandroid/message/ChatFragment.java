@@ -1,10 +1,18 @@
 package com.geostar.smackandroid.message;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -24,6 +32,7 @@ import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.base.BaseFragment;
 import com.geostar.smackandroid.message.ChatContract.Presenter;
 import com.geostar.smackandroid.message.data.dao.ChatMessage;
+import com.geostar.smackandroid.utils.FileUtils;
 import com.geostar.smackandroid.utils.Utils;
 
 public class ChatFragment extends BaseFragment implements OnRefreshListener,
@@ -66,7 +75,8 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 		mFileChooseBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Utils.showFileChooser(getActivity(), FILE_SELECT_CODE);
+				// 选取文件发送
+				Utils.showFileChooserFromFragment(ChatFragment.this, FILE_SELECT_CODE);
 			}
 		});
 		return v;
@@ -92,13 +102,13 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 		} else {
 			Utils.logDebug("mPresent is ok...");
 		}
-		mMsgLists = mPresenter.getAllMessages();
-		mAdapter = new ChatAdapter(getActivity(), mMsgLists);
-		// if(firstInMsg != null){
-		// for(String msgContent : firstInMsg){
-		// mMsgLists.add(new Message("me", msgContent));
-		// }
-		// }
+		
+		mMsgLists.clear();
+		// 因为getAllMessages从greenDao 返回，List 不支持addAll，所以不用“=”，而是直接add
+		mMsgLists.addAll(mPresenter.getAllMessages());
+//		if(mAdapter == null){
+			mAdapter = new ChatAdapter(getActivity(), mMsgLists);
+//		}
 		getListView().setItemsCanFocus(true);
 		getListView().setAdapter(mAdapter);
 	}
@@ -137,6 +147,11 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 	 */
 	class ChatAdapter extends BaseAdapter {
 
+		private long mLastTime;
+		
+		// 10分钟
+		private final long defaultTimeDis = 1000*60*10;
+		
 		private static final int MAX_MSG_SIZE = 100;
 
 		private List<ChatMessage> mMsgDatas;
@@ -176,35 +191,71 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
+			
+			TextView text ;
+			ImageView msgImage;
 			ChatMessage msg = getItem(position);
 			if (msg.getTo().contains(mPresenter.getCurrentUser())) {
 				convertView.findViewById(R.id.chat_msg_mine).setVisibility(
 						View.GONE);
 				convertView.findViewById(R.id.chat_msg_others).setVisibility(
 						View.VISIBLE);
-				holder.msgOther.setText(msg.getBody());
+				text = holder.msgOther;
+				msgImage = holder.fileMsgIconOther;
+				
 			} else {// 自己发出的消息
 				convertView.findViewById(R.id.chat_msg_mine).setVisibility(
 						View.VISIBLE);
 				convertView.findViewById(R.id.chat_msg_others).setVisibility(
 						View.GONE);
-				holder.msgMine.setText(msg.getBody());
+				text = holder.msgMine;
+				msgImage = holder.fileMsgIconMine;
 			}
+			if(msg.getMsgType().equals(ChatMessage.Type.text)){
+				text.setText(msg.getBody());
+				text.setVisibility(View.VISIBLE);
+				msgImage.setVisibility(View.GONE);
+			}else{// 文件
+				text.setVisibility(View.GONE);
+				msgImage.setVisibility(View.VISIBLE);
+				msgImage.setOnClickListener(createOnClickListener(msg));
+				msgImage.setImageResource(getImageByType(msg.getMsgType()));
+			}
+			
+			// 设置时间
+			if( Math.abs( mLastTime - msg.getTime() ) > defaultTimeDis ){
+				holder.time.setText(Utils.formatTimeDefault(msg.getTime()));
+				holder.time.setVisibility(View.VISIBLE);
+				mLastTime = msg.getTime();
+			}else{
+				holder.time.setText("");
+				holder.time.setVisibility(View.INVISIBLE);
+			}
+			
 			return convertView;
 		}
 
-		
-		
-//		@Override
-//		public boolean isEnabled(int position) {
-//			return false;
-//		}
+
+		private int getImageByType(ChatMessage.Type type) {
+			if(type.equals(ChatMessage.Type.image)){
+				return R.drawable.chat_image;
+			}else if(type.equals(ChatMessage.Type.voice)){
+				return R.drawable.chat_voice;
+			}else if(type.equals(ChatMessage.Type.video)){
+				return R.drawable.chat_video;
+			}/*else if(type.equals(ChatMessage.Type.file)){
+				return R.drawable.chat_file;
+			}*/
+			return R.drawable.chat_file;
+		}
 
 
 		class ViewHolder {
 
 			ImageView iconOther, iconMine;
 			TextView msgOther, msgMine;
+			TextView time;
+			ImageView fileMsgIconMine,fileMsgIconOther;
 
 			public ViewHolder(View convertView) {
 				iconMine = (ImageView) convertView.findViewById(
@@ -216,6 +267,14 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 						R.id.chat_msg_others).findViewById(R.id.iv_icon);
 				msgOther = (TextView) convertView.findViewById(
 						R.id.chat_msg_others).findViewById(R.id.tv_msg_content);
+				
+				fileMsgIconMine = (ImageView) convertView.findViewById(
+						R.id.chat_msg_mine).findViewById(R.id.iv_msg_icon);
+				
+				fileMsgIconOther = (ImageView) convertView.findViewById(
+						R.id.chat_msg_others).findViewById(R.id.iv_msg_icon);
+			
+				time = (TextView) convertView.findViewById(R.id.time);
 			}
 		}
 	}
@@ -242,7 +301,24 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 		mPresenter.sendMessage(msg);
 
 		mMsgInput.setText("");
+	}
 
+	/** 点击聊天中的文件  */
+	public OnClickListener createOnClickListener(final ChatMessage msg) {
+		return new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				String filePath = msg.getBody();
+				File fileToview = new File(filePath);
+				String mimeType = FileUtils.getMimeType(fileToview);
+				
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setDataAndType(Uri.fromFile(fileToview), mimeType);
+				startActivity(intent);
+			}
+		};
 	}
 
 	@Override
@@ -269,5 +345,29 @@ public class ChatFragment extends BaseFragment implements OnRefreshListener,
 		}
 		getListView().setSelection(mMsgLists.size() - 1);
 	}
+
+	@Override
+	public void refreshMessageList() {
+		onRefresh();
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// 文件选择
+		if( requestCode == FILE_SELECT_CODE && resultCode == Activity.RESULT_OK ){
+			String filepath = null;
+//			if(data.getData().getScheme().contains("file")){
+//				File f = new File(data.getData().getPath());
+//				filepath = f.getAbsolutePath();
+//			}else{
+			filepath = FileUtils.getPath(getContext(),data.getData());
+//			}
+			Utils.logDebug("DataUri:" + data.getDataString() + ";file:" + filepath);
+			mPresenter.sendFile(filepath);
+			
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
 
 }

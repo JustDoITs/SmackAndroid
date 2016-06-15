@@ -3,29 +3,85 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.geostar.smackandroid.LoginActivity" >
+    tools:context="com.geostar.smackandroid.LoginActivity" 
+    android:background="@color/common_gray">
 
-    <EditText
-        android:id="@+id/et_username"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="56dp" 
+        android:text="@string/login"
+        android:textSize="22dp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@color/common_blue"
+        android:layout_alignParentTop="true"/>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="用户名" />
+        android:layout_marginTop="24dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <EditText
-        android:id="@+id/et_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="密码" 
-        android:password="true"/>
+        <EditText
+            android:id="@+id/et_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-1dp"
+            android:background="@drawable/chat_input_bg"
+            android:hint="用户名"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:textColorHint="#bcbcbc"
+            android:textColor="@color/common_blue" >
 
-    <Button
-        android:id="@+id/btn_submit_or_reg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:hint="登录" />
+        </EditText>
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chat_input_bg"
+            android:hint="密码"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:password="true"
+            android:textColorHint="#bcbcbc"
+            android:textColor="@color/common_blue" />
+
+        <LinearLayout 
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:gravity="right"
+            >
+            <CheckBox 
+            	android:id="@+id/cb_remember_password"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/remember_password"
+                android:textSize="16dp"
+                
+                android:textColor="@color/common_blue"
+                />
+        </LinearLayout>
+        
+        <Button
+            android:id="@+id/btn_submit_or_reg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="#1ebaf3"
+            android:hint="登录"
+            android:textColor="#fff"
+            android:textSize="18dp" />
+    </LinearLayout>
 
 </LinearLayout>

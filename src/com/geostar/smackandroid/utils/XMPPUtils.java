@@ -1,5 +1,7 @@
 package com.geostar.smackandroid.utils;
 
+import java.io.File;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.ConnectionException;
 import org.jivesoftware.smack.XMPPException;
@@ -7,11 +9,12 @@ import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.sasl.SASLErrorException;
-
-import com.geostar.smackandroid.message.data.dao.ChatMessage;
+import org.jivesoftware.smackx.chatstates.ChatState;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.geostar.smackandroid.message.data.dao.ChatMessage;
 
 public class XMPPUtils {
 
@@ -41,7 +44,7 @@ public class XMPPUtils {
 	
 	/** 获取用户名 
 	 *  注：jid 用户名不能有@ */
-	private static final String getBareJid(@NonNull String jid){
+	public static final String getUserName(@NonNull String jid){
 		return jid.split("@")[0];
 	}
 	
@@ -53,7 +56,7 @@ public class XMPPUtils {
 
 	// TODO: 消息类型处理 
 	/**
-	 * 
+	 * 转换text消息
 	 * @param msg
 	 * @return
 	 */
@@ -66,8 +69,22 @@ public class XMPPUtils {
 		local.setThread(msg.getThread());
 		local.setTime(System.currentTimeMillis());
 		local.setTo(msg.getTo());
-		local.setType(msg.getType().toString());
+		local.setType(ChatMessage.Type.text);
 		return local;
+	}
+	
+	public static ChatMessage.Type getFileMsgType(File file){
+		String mime = FileUtils.getMimeType(file);
+		if(mime.startsWith("image")){
+			return ChatMessage.Type.image;
+		}else if(mime.startsWith("video")){
+			return ChatMessage.Type.video;
+		}else if(mime.startsWith("audio")){
+			return ChatMessage.Type.voice;
+		}else if(file.getAbsolutePath().toLowerCase().contains("apk")){
+			return ChatMessage.Type.file;
+		}
+		return ChatMessage.Type.unknown;
 	}
 	
 }

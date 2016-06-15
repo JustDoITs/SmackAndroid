@@ -6,6 +6,7 @@ package com.geostar.smackandroid.message.data.dao;
  */
 public class ChatMessage implements java.io.Serializable {
 
+	
     private Long id;
     private String from;
     private String to;
@@ -18,6 +19,12 @@ public class ChatMessage implements java.io.Serializable {
     private String extentedContent;
     private Long serverTime;
 
+    // KEEP FIELDS - put your custom fields here
+    public enum Type {
+    	file,text,image,voice,video,unknown
+    }
+    // KEEP FIELDS END
+    
     public ChatMessage() {
     }
 
@@ -138,5 +145,32 @@ public class ChatMessage implements java.io.Serializable {
     public void setServerTime(Long serverTime) {
         this.serverTime = serverTime;
     }
+    
+
+    // KEEP METHODS - put your custom methods here
+    public void setType(Type type){
+    	setType(type.toString());
+    }
+    
+    public Type getMsgType(){
+    	if(Type.file.toString().equalsIgnoreCase(getType())){
+    		return Type.file;
+    	}else 
+    	if(Type.image.toString().equalsIgnoreCase(getType())){
+    		return Type.image;
+    	}else
+    	if(Type.text.toString().equalsIgnoreCase(getType())){
+    		return Type.text;
+    	}else
+    	if(Type.video.toString().equalsIgnoreCase(getType())){
+    		return Type.video;
+    	}else
+    	if(Type.voice.toString().equalsIgnoreCase(getType())){
+    		return Type.voice;
+    	}else{
+    		return Type.unknown;
+    	}
+    }
+    // KEEP METHODS END
 
 }

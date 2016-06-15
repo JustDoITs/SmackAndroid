@@ -1,5 +1,8 @@
 package com.geostar.smackandroid.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.ConnectionException;
 import org.jivesoftware.smack.XMPPException;
@@ -9,6 +12,7 @@ import org.jivesoftware.smack.sasl.SASLErrorException;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -58,5 +62,26 @@ public class Utils {
 	    } catch (android.content.ActivityNotFoundException ex) {
 	        Toast.makeText(context, "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
 	    }
+	}
+	
+	/** 选取文件 
+	 * @param context Activity obj
+	 * @param FILE_SELECT_CODE 请求码
+	 */
+	public static void showFileChooserFromFragment(Fragment context,int FILE_SELECT_CODE) {
+	    Intent intent = new Intent(Intent.ACTION_GET_CONTENT); 
+	    intent.setType("*/*"); 
+	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+	 
+	    try {
+	    	context.startActivityForResult( Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+	    } catch (android.content.ActivityNotFoundException ex) {
+	        Toast.makeText(context.getContext(), "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
+	    }
+	}
+	
+	public static final String formatTimeDefault(long time){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd kk:mm");
+		return format.format(new Date(time));
 	}
 }

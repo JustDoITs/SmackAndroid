@@ -18,6 +18,7 @@ import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService;
 import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 import com.geostar.smackandroid.utils.Utils;
+import com.geostar.smackandroid.utils.XMPPUtils;
 
 /**
  * 聊天
@@ -102,8 +103,12 @@ public class ChatActivity extends FragmentActivity {
 		
 		setContentView(R.layout.activity_chat);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setTitle(XMPPUtils.getUserName(mChatOjb));
 		
 		mChatFragment = new ChatFragment();
+//		if(getIntent() != null){
+//			mChatFragment.setArguments(getIntent().getExtras());
+//		}
 		// 加入View
 		getSupportFragmentManager().beginTransaction()
 			.add(R.id.fl_fragment_container,mChatFragment).commit();

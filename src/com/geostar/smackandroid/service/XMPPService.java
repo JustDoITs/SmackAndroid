@@ -24,6 +24,10 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -50,7 +54,7 @@ import com.geostar.smackandroid.utils.XMPPUtils;
  * @author jianghanghang
  *
  */
-public class XMPPService extends Service implements IXMPPService,IChatMsgSubject,IChatMsgObserver{
+public class XMPPService extends Service implements IXMPPService,IChatMsgSubject,IChatMsgObserver, FileTransferListener{
 
 	private static final String TAG = "XMPPService";
 	
@@ -78,6 +82,8 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
     
     /** 未通知的聊天消息 */
     private List<ChatMessage> mNewUnReadMessages = new ArrayList<ChatMessage>();
+
+	private FileTransferManager mFileTransManager;
     
     
     @Override
@@ -257,6 +263,7 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
                     Utils.logDebug(TAG,"接收到一条消息: " +  msg.getBody());
                     /* ----------	 当接收到带有body的 聊天消息时的处理逻辑 ；
                      * 			    	 此时可能应用不在前台  -------- */
+                    mNewUnReadMessages.clear();
                     if(!mNewUnReadMessages.contains(chatmsg)){
                     	mNewUnReadMessages.add(chatmsg);
                     }
@@ -268,6 +275,10 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
         };
 //        mXmppConnection.addAsyncStanzaListener(listener,ForEveryMessage.INSTANCE);
         mXmppConnection.addAsyncStanzaListener(messagelistener, MessageWithBodiesFilter.INSTANCE);
+		if(mFileTransManager == null){
+			mFileTransManager = FileTransferManager.getInstanceFor(mXmppConnection);
+			mFileTransManager.addFileTransferListener(this);
+		}
     }
 
     protected void saveNewChatMessage(ChatMessage msg) {
@@ -362,6 +373,10 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	public void registerChatMessageObserver(IChatMsgObserver obs) {
 		if(!mChatMessageObses.contains(obs)){
 			mChatMessageObses.add(obs);
+			// 如果有其他的消息观察者，则移除服务里的
+			if(mChatMessageObses.size() > 2 && mChatMessageObses.contains(this)){
+				mChatMessageObses.remove(this);
+			}
 		}
 	}
 
@@ -369,6 +384,10 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 	public void unregisterChatMessageObserver(IChatMsgObserver obs) {
 		if(mChatMessageObses.contains(obs)){
 			mChatMessageObses.remove(obs);
+			// 如果当前移除了所有观察者，则添加服务自身作为后台观察
+			if(mChatMessageObses.size() == 0){
+				mChatMessageObses.add(this);
+			}
 		}
 	}
 
@@ -377,7 +396,6 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 		for(IChatMsgObserver obs : mChatMessageObses){
 			obs.update(mNewUnReadMessages);
 		}
-		mNewUnReadMessages.clear();
 	}
 
 	@Override
@@ -387,6 +405,41 @@ public class XMPPService extends Service implements IXMPPService,IChatMsgSubject
 
 	@Override
 	public void setChatMsgSubject(IChatMsgSubject chatMsgSubject) {// 自己就是Subject，do nothing
+	}
+	
+	
+	/** 
+	 * 监听到文件传输请求
+	 * 直接接收，然后更新聊天记录
+	 */
+	@Override
+	public void fileTransferRequest(FileTransferRequest request) {
+		Utils.logDebug("Get A file Transfer Request,FileName:" + request.getFileName());
+		// 接收保存文件
+		IncomingFileTransfer inft = request.accept();
+		String filePath = Configuration.getUserFileRecDir(this, mXmppConnection.getUser()) + File.separator + request.getFileName();
+		try {
+			inft.recieveFile( new File(filePath) );
+		} catch (SmackException | IOException e) {
+			// TODO 异常处理
+			e.printStackTrace();
+		}
+		Utils.logDebug("文件接受完毕");
+		
+		// 更新数据库记录
+		ChatMessageRepository.getInstance().checkoutDS(XMPPUtils.getJidWithoutRes(request.getRequestor()));
+		ChatMessage msg = new ChatMessage();
+		msg.setBody(filePath); // body 为文件路径
+		msg.setFrom(request.getRequestor());// 文件传输者
+		msg.setTime(System.currentTimeMillis());
+		msg.setTo(mXmppConnection.getUser());
+		ChatMessageRepository.getInstance().saveChatMessage(msg);
+		
+		// 通知UI 更新消息列表
+		mNewUnReadMessages.clear();
+		mNewUnReadMessages.add(msg);
+		notifyNewChatMessage();
+		
 	}
 
 }

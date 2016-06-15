@@ -19,6 +19,8 @@ public interface ChatContract {
 		
 		void postNewMessage(List<ChatMessage> newMsgs);
 		
+		/** 刷新  */
+		void refreshMessageList();
 	}
 
 	interface Presenter extends BasePresenter {
