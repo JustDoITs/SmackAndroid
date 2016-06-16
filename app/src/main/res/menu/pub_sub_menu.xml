@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.geostar.smackandroid.TestActivity" >
+
+    <item
+        android:id="@+id/action_add_sub"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="添加订阅"/>
+    
+    <item
+        android:id="@+id/action_add_test_node"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="添加一个测试节点"/>
+
+</menu>

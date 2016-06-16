@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/contact_item_height"
+    android:orientation="horizontal"
+    android:paddingLeft="24dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingRight="8dp"
+    android:descendantFocusability="beforeDescendants"
+    >
+
+    <ImageView
+        android:id="@+id/iv_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/contact_icon"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ll_user_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical"
+        android:layout_centerVertical="true" 
+        android:layout_toRightOf="@id/iv_icon"
+        android:layout_toLeftOf="@+id/btn_redot">
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:drawablePadding="10dp"
+            android:text="hanlyjiang"
+            android:textColor="@color/contact_text_color"
+            android:textSize="@dimen/contact_item_text_size" />
+
+        <TextView
+            android:id="@+id/tv_presence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="10dp"
+            android:text="Online"
+            android:textSize="@dimen/contact_item_status_text_size" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_redot"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/reddot_only"
+        android:focusable="false"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="#fff"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        />
+
+</RelativeLayout>

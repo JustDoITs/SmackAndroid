@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="#e3e3e3">
+
+    <LinearLayout
+        android:id="@+id/contact_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_input_area"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swiperefresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ListView
+                android:id="@android:id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:paddingLeft="8dp"
+		        android:clickable="false"
+                android:paddingRight="8dp" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/ll_input_area"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" 
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            >
+            
+
+            <Button
+                android:id="@+id/btn_send_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/chat_send_msg_bg"
+                android:minHeight="30dp"
+                android:minWidth="36dp"
+                android:padding="8dp"
+                android:text="@string/send"
+                android:textColor="#fff"
+                android:textSize="14dp" />
+
+            <EditText
+                android:id="@+id/et_input_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:layout_toLeftOf="@+id/btn_send_msg"
+                android:layout_toRightOf="@+id/ib_chat_send_more"
+                android:background="@drawable/chat_input_bg"
+                android:ems="10"
+                android:maxLines="4"
+                android:minHeight="30dp"
+                android:paddingLeft="8dp"
+                android:textSize="15dp" />
+
+            <ImageButton
+                android:id="@+id/ib_chat_send_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@android:color/transparent"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/idz" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

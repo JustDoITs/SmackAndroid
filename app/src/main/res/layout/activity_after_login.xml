@@ -1,0 +1,93 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/toolbar"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:background="@color/common_blue"
+        android:elevation="4dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/contacts"
+            android:layout_centerInParent="true"
+            android:textSize="@dimen/commit_title_bar_textsize"
+            android:textColor="#fff"
+            android:id="@+id/tv_title" />
+        </android.support.v7.widget.Toolbar>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/menu_bar_with_divider"
+        android:layout_below="@+id/toolbar"
+        android:paddingTop="8dp"
+        tools:context="com.geostar.smackandroid.MainActivity" />
+
+    <LinearLayout
+        android:id="@+id/menu_bar_with_divider"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/common_gray" />
+
+        <LinearLayout
+            android:id="@+id/ll_menu_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" 
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/ib_menu_contact"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/mian_contact_selector"
+                android:gravity="left|center_vertical"
+                android:background="@android:color/transparent"
+                android:text="联系人" />
+
+            <ImageButton
+                android:id="@+id/ib_menu_msg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/mian_msg_selector"
+                android:gravity="left|center_vertical"
+                android:background="@android:color/transparent"
+                android:text="消息" />
+
+            <ImageButton
+                android:id="@+id/ib_menu_pubsub"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/mian_pubsub_selector"
+                android:gravity="left|center_vertical"
+                android:background="@android:color/transparent"
+                android:text="订阅" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

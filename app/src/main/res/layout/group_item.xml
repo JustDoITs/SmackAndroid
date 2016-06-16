@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/contact_group_height"
+    android:orientation="vertical"
+    android:layout_marginLeft="16dp" >
+    
+    <TextView 
+        android:id="@+id/text"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="1"
+        android:padding="8dp"
+        android:textSize="@dimen/contact_group_text_size"
+        android:layout_marginLeft="@dimen/contact_group_margin_left"
+        android:textColor="@color/contact_text_color"
+        />
+</LinearLayout>
