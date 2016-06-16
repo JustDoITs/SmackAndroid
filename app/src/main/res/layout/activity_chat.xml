@@ -2,9 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.geostar.smackandroid.message.ChatActivity" >
+    tools:context=".message.ChatActivity" >
 
-    <FrameLayout 
+    <include
+        layout="@layout/common_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <FrameLayout
+        android:layout_below="@+id/toolbar"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:id="@+id/fl_fragment_container"

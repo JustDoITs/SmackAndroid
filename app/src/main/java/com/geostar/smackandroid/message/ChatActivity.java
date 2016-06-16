@@ -1,18 +1,18 @@
 package com.geostar.smackandroid.message;
 
-import java.util.List;
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.geostar.smackandroid.R;
 import com.geostar.smackandroid.service.XMPPService;
@@ -20,12 +20,14 @@ import com.geostar.smackandroid.service.XMPPService.XMPPBinder;
 import com.geostar.smackandroid.utils.Utils;
 import com.geostar.smackandroid.utils.XMPPUtils;
 
+import java.util.List;
+
 /**
  * 聊天
  * @author jianghanghang
  *
  */
-public class ChatActivity extends FragmentActivity {
+public class ChatActivity extends AppCompatActivity {
 
 	protected static final String TAG = "ChatActivity";
 	
@@ -102,8 +104,14 @@ public class ChatActivity extends FragmentActivity {
 		}
 		
 		setContentView(R.layout.activity_chat);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setTitle(XMPPUtils.getUserName(mChatOjb));
+		// 设置标题栏
+		final Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+		myToolbar.setTitle("");
+		myToolbar.setNavigationIcon(R.drawable.common_back_arrow_selector);
+		setSupportActionBar(myToolbar);
+		((TextView)myToolbar.findViewById(R.id.tv_title)).setText(XMPPUtils.getUserName(mChatOjb));
+//		getActionBar().setDisplayHomeAsUpEnabled(true);
+//		getActionBar().setTitle(XMPPUtils.getUserName(mChatOjb));
 		
 		mChatFragment = new ChatFragment();
 //		if(getIntent() != null){

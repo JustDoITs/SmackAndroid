@@ -24,4 +24,5 @@
     
 
     <string name="app_data_path">/sdcard/smackandroid/data</string>
+    <string name="go_back">返回</string>
 </resources>
