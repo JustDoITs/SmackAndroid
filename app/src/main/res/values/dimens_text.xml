@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="primary_text_size">20dp</dimen>
+    <dimen name="second_text_size">18dp</dimen>
+    <dimen name="title_text_size">22dp</dimen>
+
+    <dimen name="list_grp_item_text_size">18dp</dimen>
+    <dimen name="list_item_primary_text_size">20dp</dimen>
+    <dimen name="list_item_secondary_text">16dp</dimen>
+
+</resources>

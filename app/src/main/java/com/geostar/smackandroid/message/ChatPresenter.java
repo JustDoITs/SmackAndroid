@@ -1,27 +1,8 @@
 package com.geostar.smackandroid.message;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.chat.Chat;
-import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.packet.Message.Type;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferManager;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.geostar.smackandroid.config.Configuration;
 import com.geostar.smackandroid.message.data.dao.ChatMessage;
@@ -32,6 +13,21 @@ import com.geostar.smackandroid.service.IChatMsgObserver;
 import com.geostar.smackandroid.service.IChatMsgSubject;
 import com.geostar.smackandroid.utils.Utils;
 import com.geostar.smackandroid.utils.XMPPUtils;
+
+import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ChatPresenter implements ChatContract.Presenter,IChatMsgObserver{
@@ -77,18 +73,30 @@ public class ChatPresenter implements ChatContract.Presenter,IChatMsgObserver{
 	}
 	
 
-	// TODO : 更新文件传输进度
+	// TODO : 更新文件传输进度 + 放置到服务中去发送文件
+
 	@Override
 	public void sendFile(String filePath) {
 		// Create the file transfer manager
 		FileTransferManager manager = FileTransferManager.getInstanceFor(mConnection);
-		
+
+		// 因为发送文件必须要知道对方的fullJId，也就是包含资源部分的jid，所以先获取当前用户所有可用的fulljid
 		Roster roster= Roster.getInstanceFor(mConnection);
-		List<Presence> preses = roster.getPresences(mTo); 
-		for(Presence p : preses){
-			// Create the outgoing file transfer
-			OutgoingFileTransfer transfer = manager.createOutgoingFileTransfer( p.getFrom());
+		List<Presence> preses = roster.getPresences(mTo);
+		List<String> sendTos = new ArrayList<>();
+		for( Presence p : preses ){
 			Utils.logDebug("To jid :" + mTo + "/" + p.getFrom() + ";status :" + p.getStatus());
+			if(p.getStatus() != null){ // 如果Presence statu 为null，则表示此用户没有登录，也就没有资源ID
+				sendTos.add(p.getFrom());
+			}
+		}
+		if(sendTos.size() == 0){
+			Toast.makeText(mContext, "对方不在线，无法发送文件！",Toast.LENGTH_LONG).show();
+			return;
+		}
+		for(String sentTo : sendTos){
+			// Create the outgoing file transfer
+			OutgoingFileTransfer transfer = manager.createOutgoingFileTransfer(sentTo);
 			// Send the file
 			try {
 				File file2Sent = new File(filePath);
@@ -96,7 +104,7 @@ public class ChatPresenter implements ChatContract.Presenter,IChatMsgObserver{
 				
 				ChatMessage chatmsg = new ChatMessage();
 				chatmsg.setFrom(mCurrentUser);
-				chatmsg.setTo(p.getFrom());
+				chatmsg.setTo(sentTo);
 				chatmsg.setBody(filePath);
 				chatmsg.setTime(System.currentTimeMillis());
 				// TODO: 
@@ -118,6 +126,7 @@ public class ChatPresenter implements ChatContract.Presenter,IChatMsgObserver{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			// TODO : 可以通过transfer 去获取传输状态
 //			transfer.getStatus();
 		}
 	}

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SmackAndroid.iml" filepath="$PROJECT_DIR$/SmackAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stylelib/stylelib.iml" filepath="$PROJECT_DIR$/stylelib/stylelib.iml" />
     </modules>
   </component>
 </project>

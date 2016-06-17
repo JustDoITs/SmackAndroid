@@ -5,11 +5,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     
     <dimen name="contact_group_height">40dp</dimen>
-    <dimen name="contact_group_text_size">18dp</dimen>
-    <dimen name="contact_item_text_size">20dp</dimen>
     <dimen name="contact_item_status_text_size">16dp</dimen>
     <dimen name="contact_item_height">48dp</dimen>
     <dimen name="contact_group_margin_left">30dp</dimen>
-    <dimen name="commit_title_bar_textsize">22dp</dimen>
 
 </resources>

@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
@@ -66,21 +67,20 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mXmppService = ((XMPPBinder)service).getService();
+			Utils.logDebug("OnServiceConnected... at MainActivity");
 			// 当连接到服务时，设置Presenter，因为登录后一般是已连接的，可以确保mXmppService.getXMPPConnection() 不为null
-			RosterFragment frag = (RosterFragment)mSectionsPagerAdapter.getItem(PAGE_ROSTER);
+			RosterFragment frag = (RosterFragment)getSectionAdapter().getItem(PAGE_ROSTER);
 			frag.setChatMsgSubject(mXmppService);
 			BasePresenter contactPresenter = new RosterPresenter(mXmppService.getXMPPConnection(), frag);
-//			contactPresenter.onServiceConnected(mXmppService.getXMPPConnection());
-			
-			ChatRecordFragment cfrag = (ChatRecordFragment)mSectionsPagerAdapter.getItem(PAGE_CHAT);
+			Utils.logDebug("RosterFragment : " + frag + "; Adapter:" + getSectionAdapter() + "; RosterPresenter:" + contactPresenter);
+
+			ChatRecordFragment cfrag = (ChatRecordFragment)getSectionAdapter().getItem(PAGE_CHAT);
 			frag.setChatMsgSubject(mXmppService);
 			ChatRecordPresenter chatPresenter = new ChatRecordPresenter(mXmppService.getXMPPConnection(), cfrag);
 			
-			PubSubFragment pf = (PubSubFragment)mSectionsPagerAdapter.getItem(PAGE_PUBSUB);
+			PubSubFragment pf = (PubSubFragment)getSectionAdapter().getItem(PAGE_PUBSUB);
 			BasePresenter pubSubPresenter = new PubSubPresenter(mXmppService.getXMPPConnection(), pf);
-//			pubSubPresenter.onServiceConnected(mXmppService.getXMPPConnection());
-			
-//			getActionBar().setTitle(mXmppService.getXMPPConnection().getUser().split("@")[0]);
+
 		}
 	};
 
@@ -95,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
 			changeMenuBarSelectedState(v.getId());
 		}
 	};
+
+	private synchronized SectionsPagerAdapter getSectionAdapter(){
+		if(mSectionsPagerAdapter == null){
+			mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		}
+		return mSectionsPagerAdapter;
+	}
 	
 	
 	private void changeMenuBarSelectedState(int selectId){
@@ -151,18 +158,14 @@ public class MainActivity extends AppCompatActivity {
 		if(savedInstanceState != null){
 			mCurrentPage = savedInstanceState.getInt("page");
 		}
-		
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-//		getActionBar().setTitle(getResources().getString(R.string.app_name));
-//		initActionBar();
+		mViewPager.setAdapter(getSectionAdapter());
+
 		mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
 						mCurrentPage = position;
-//						getActionBar().selectTab(getActionBar().getTabAt(position));
                         ((TextView)myToolbar.findViewById(R.id.tv_title)).setText(mSectionsPagerAdapter.getPageTitle(position));
 						changeMenuBarSelectedState(getPageMenuId(position));
 					}
@@ -179,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
 
 	private void initMenuBar() {
 		mMenuBar = (LinearLayout) findViewById(R.id.ll_menu_bar);
@@ -199,36 +206,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onSaveInstanceState(arg0);
 	}
 	
-//	private void initActionBar() {
-//		// TODO Auto-generated method stub
-//		final ActionBar actionBar = getActionBar();
-//
-//		// Specify that tabs should be displayed in the action bar.
-//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//
-//		// Create a tab listener that is called when the user changes tabs.
-//		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-//			@Override
-//			public void onTabSelected(Tab tab,
-//					android.app.FragmentTransaction fragmenttransaction) {
-//				mViewPager.setCurrentItem(tab.getPosition());
-//			}
-//
-//			@Override
-//			public void onTabUnselected(Tab tab,
-//					android.app.FragmentTransaction fragmenttransaction) {}
-//
-//			@Override
-//			public void onTabReselected(Tab tab,
-//					android.app.FragmentTransaction fragmenttransaction) {}
-//		};
-//
-//		// Add 3 tabs, specifying the tab's text and TabListener
-//		for (int i = 0; i < PAGE_SIZE_3; i++) {
-//			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i).toString())
-//					.setTabListener(tabListener));
-//		}
-//	}
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -245,7 +222,9 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public BaseFragment getItem(int position) {
 			if(!mFragments.containsKey(""+ position)){
-				mFragments.put(""+position, createFragmentItem(position));
+				BaseFragment frag  = createFragmentItem(position);
+				mFragments.put(""+position, frag);
+				Utils.logDebug("Create Fragment : adapter=" + this.toString() + frag.toString());
 			}
 			return mFragments.get(""+position);
 		}
@@ -284,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
 		default:
 			break;
 		}
+
 		return frag;
 	}
 	

@@ -1,13 +1,13 @@
 package com.geostar.smackandroid.contacts;
 
-import java.util.List;
+import com.geostar.smackandroid.base.BasePresenter;
+import com.geostar.smackandroid.base.BaseView;
 
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterGroup;
 
-import com.geostar.smackandroid.base.BasePresenter;
-import com.geostar.smackandroid.base.BaseView;
+import java.util.List;
 
 public interface RosterContract {
 

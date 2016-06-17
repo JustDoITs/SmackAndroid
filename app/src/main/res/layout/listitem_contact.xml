@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/contact_item_height"
-    android:orientation="horizontal"
-    android:paddingLeft="24dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:paddingRight="8dp"
-    android:descendantFocusability="beforeDescendants"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/contact_item_height"
+                android:descendantFocusability="beforeDescendants"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp"
+                android:paddingLeft="24dp"
+                android:paddingRight="8dp"
+                android:paddingTop="8dp"
     >
 
     <ImageView
@@ -17,35 +17,38 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:src="@drawable/contact_icon"
-        android:visibility="gone" />
+        android:visibility="gone"
+        />
 
     <LinearLayout
         android:id="@+id/ll_user_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="8dp"
-        android:orientation="vertical"
-        android:layout_centerVertical="true" 
+        android:layout_toLeftOf="@+id/btn_redot"
         android:layout_toRightOf="@id/iv_icon"
-        android:layout_toLeftOf="@+id/btn_redot">
+        android:orientation="vertical"
+        >
 
         <TextView
             android:id="@+id/tv_username"
+            style="@style/Text.ListView.Item.Primary.Default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:drawablePadding="10dp"
             android:text="hanlyjiang"
-            android:textColor="@color/contact_text_color"
-            android:textSize="@dimen/contact_item_text_size" />
+            />
 
         <TextView
             android:id="@+id/tv_presence"
+            style="@style/Text.ListView.Item.Secondary.Default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
             android:text="Online"
-            android:textSize="@dimen/contact_item_status_text_size" />
+            />
     </LinearLayout>
 
     <Button

@@ -27,9 +27,7 @@
         android:orientation="vertical">
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/common_gray" />
+            style="@style/Divider.Horizontal.Default" />
 
         <LinearLayout
             android:id="@+id/ll_menu_bar"

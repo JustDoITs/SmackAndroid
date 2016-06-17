@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Divider">
+    </style>
+
+    <!-- 没有设置color -->
+    <style name="Divider.Horizontal.NoColor" parent="Divider">
+        <item name="android:layout_height">@dimen/spacing_horizontal_divider_height</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <!-- 没有设置color -->
+    <style name="Divider.Vertical.NoColor" parent="Divider">
+        <item name="android:layout_width">@dimen/spacing_vertical_divider_width</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="Divider.Horizontal.Default" parent="Divider.Horizontal.NoColor">
+        <item name="android:background">@color/gray</item>
+    </style>
+
+    <style name="Divider.Vertical.Default" parent="Divider.Vertical.NoColor">
+        <item name="android:background">@color/gray</item>
+    </style>
+
+</resources>

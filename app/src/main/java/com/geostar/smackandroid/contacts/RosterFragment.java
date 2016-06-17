@@ -1,14 +1,5 @@
 package com.geostar.smackandroid.contacts;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.roster.RosterEntry;
-import org.jivesoftware.smack.roster.RosterGroup;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,13 +24,24 @@ import com.geostar.smackandroid.message.ChatActivity;
 import com.geostar.smackandroid.message.data.dao.ChatMessage;
 import com.geostar.smackandroid.service.IChatMsgObserver;
 import com.geostar.smackandroid.service.IChatMsgSubject;
+import com.geostar.smackandroid.utils.Utils;
+
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RosterFragment extends BaseFragment implements RosterContract.View,OnRefreshListener,IChatMsgObserver{
 	
 	private static final String TAG = "RosterFragment";
 
 	private RosterContract.Presenter mPresenter;
-	
+
+
+
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	
 	private List<RosterGroup> mRostersData = new ArrayList<RosterGroup>();
@@ -82,7 +84,6 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 	public void onResume() {
 		if(mPresenter != null){
 			mPresenter.start();
-//			updateContactList(mPresenter.getAllRosterEntrys());
 		}
 		if(mChatMsgSubject != null){
 			mChatMsgSubject.registerChatMessageObserver(this);
@@ -214,8 +215,11 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 
 	@Override
 	public void onRefresh() {
+		Utils.logDebug("onRefresh -- RosterFragment " + this + "; mPresenter :" + mPresenter);
 		if(mPresenter != null){
 			updateContactList(mPresenter.getRosterGroups());
+		}else{
+			Utils.logDebug("mPresenter is null in RosterFragment!!!");
 		}
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
@@ -268,6 +272,7 @@ public class RosterFragment extends BaseFragment implements RosterContract.View,
 			showContactGrpList(entry);
 		}
 	}
+
 
 	/**
 	 * 供后台线程调用

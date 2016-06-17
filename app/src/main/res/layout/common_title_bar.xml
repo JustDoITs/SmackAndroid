@@ -5,20 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
-    android:background="@color/common_blue"
+    android:background="@color/scolorPrimary"
     android:elevation="4dp"
     android:gravity="center"
     app:navigationContentDescription="@string/go_back"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-    app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Large">
+    app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+    >
 
     <TextView
         android:id="@+id/tv_title"
+        style="@style/Text.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:text="@string/contacts"
-        android:textColor="#fff"
-        android:textSize="@dimen/commit_title_bar_textsize" />
+        />
 </android.support.v7.widget.Toolbar>

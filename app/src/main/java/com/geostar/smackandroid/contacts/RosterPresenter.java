@@ -1,8 +1,7 @@
 package com.geostar.smackandroid.contacts;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.geostar.smackandroid.contacts.RosterContract.View;
+import com.geostar.smackandroid.utils.Utils;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
@@ -11,7 +10,9 @@ import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterGroup;
 import org.jivesoftware.smack.roster.RosterListener;
 
-import com.geostar.smackandroid.contacts.RosterContract.View;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 public class RosterPresenter implements RosterContract.Presenter ,RosterListener {
@@ -32,6 +33,7 @@ public class RosterPresenter implements RosterContract.Presenter ,RosterListener
 			mRoster = Roster.getInstanceFor(mConnection);
 			mRoster.addRosterListener(this);
 			mContactView.showContactGrpList(getRosterGroups());
+			Utils.logDebug("Presenter init -- mContactView : " + mContactView +  "; RosterPresenter:" + this);
 		}else{
 			System.out.println("------ ERROR: connnect not connected!!!");
 		}

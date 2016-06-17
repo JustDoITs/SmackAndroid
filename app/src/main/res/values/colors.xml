@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <!-- 主色调 -->
+    <color name="scolorPrimary">#1ebaf3</color>
+    <!-- 辅色调 -->
+    <color name="gray">#e3e3e3</color>
+    <color name="white">@android:color/white</color>
+    <color name="black">@android:color/black</color>
 </resources>
